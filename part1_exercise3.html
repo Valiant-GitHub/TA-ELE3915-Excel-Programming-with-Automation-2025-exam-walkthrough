@@ -868,6 +868,63 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Site footer ---------- */
+.site-footer {
+  max-width: 780px;
+  margin: 40px auto 0;
+  padding: 28px 28px 32px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.site-footer-text {
+  margin: 0 0 12px;
+}
+
+.site-footer-text code {
+  font-family: var(--mono-font);
+  font-size: 0.92em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.site-footer-text strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.site-footer-link {
+  margin: 0;
+}
+
+.site-footer-link a {
+  font-family: var(--header-font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent-current) 55%, transparent);
+  display: inline-block;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.site-footer-link a:hover {
+  background: var(--accent-current);
+  color: var(--navy);
+}
+
+@media print {
+  .site-footer { break-before: avoid; }
+}
+
 /* ---------- Print fallback ---------- */
 @media print {
   .topnav, .toc, .progress-bar, .copy-btn, .reveal-btn, .toc-toggle, .topnav-toggle { display: none !important; }
@@ -1161,6 +1218,7 @@ end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 </dl></section>
   </main>
 </div>
+<footer class="site-footer" role="contentinfo"><p class="site-footer-text">Made by Vilijam Cekov (Teaching Assistant) for the course ELE 3915 Excel Programming with Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Ocean Depths theme from the <code>theme-factory</code> palette collection. Excel function references link to the excellent <strong>ExcelJet</strong> reference library.</p><p class="site-footer-link"><a href="https://github.com/Valiant-GitHub/TA-ELE3915-Excel-Programming-with-Automation-2025-exam-walkthrough" target="_blank" rel="noopener">Go to the GitHub Repository &rarr;</a></p></footer>
 <script>
 (function () {
   const bar = document.querySelector('.progress-bar');

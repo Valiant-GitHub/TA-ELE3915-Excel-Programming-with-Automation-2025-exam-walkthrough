@@ -868,6 +868,63 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Site footer ---------- */
+.site-footer {
+  max-width: 780px;
+  margin: 40px auto 0;
+  padding: 28px 28px 32px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.site-footer-text {
+  margin: 0 0 12px;
+}
+
+.site-footer-text code {
+  font-family: var(--mono-font);
+  font-size: 0.92em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.site-footer-text strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.site-footer-link {
+  margin: 0;
+}
+
+.site-footer-link a {
+  font-family: var(--header-font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent-current) 55%, transparent);
+  display: inline-block;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.site-footer-link a:hover {
+  background: var(--accent-current);
+  color: var(--navy);
+}
+
+@media print {
+  .site-footer { break-before: avoid; }
+}
+
 /* ---------- Print fallback ---------- */
 @media print {
   .topnav, .toc, .progress-bar, .copy-btn, .reveal-btn, .toc-toggle, .topnav-toggle { display: none !important; }
@@ -948,8 +1005,9 @@ body {
   <button class="topnav-toggle" aria-label="Toggle navigation" type="button">Menu</button>
 </nav>
 <div class="landing-shell">
-  <header class="landing-hero"><h1 class="landing-title">ELE3915 — 2025 Take-Home Exam Walkthroughs</h1><p class="landing-blurb">Interactive companion reports for the ELE3915 take-home exam. Part 1 covers formulas and LAMBDAs on the <code>AIMODEL</code> and <code>MATH</code> datasets. Part 2 covers ExcelScript on the <code>BIKE</code> dataset. Open any report, use the contents sidebar to navigate, and click the reveal buttons at the &ldquo;Pause&rdquo; prompts to test yourself before reading the walkthrough.</p></header><section class="landing-group part-1"><h2 class="landing-group-title" style="color: #43c2c2;">Part 1 — Formulas &amp; LAMBDAs</h2><div class="landing-cards"><a class="landing-card" href="part1_exercise1.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">01</div><div class="landing-card-label">Ex1</div><h3 class="landing-card-title">Exercise 1: AIMODEL analysis with LAMBDA</h3><p class="landing-card-summary">Exercise 1 lives on the AIMODEL sheet of exam_part1.xlsx.</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part1_exercise2.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">02</div><div class="landing-card-label">Ex2</div><h3 class="landing-card-title">Exercise 2: Charts, log axes, and FLOP by year</h3><p class="landing-card-summary">Exercise 2 pivots from pure LAMBDA work into charts.</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part1_exercise3.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">03</div><div class="landing-card-label">Ex3</div><h3 class="landing-card-title">Exercise 3: FINDBEST over the MATH benchmark</h3><p class="landing-card-summary">Exercise 3 moves to the second dataset, MATH, which holds benchmark results on MATH Level 5 — high-school competition math — for a long list of AI models with their release dates.</p><span class="landing-card-cta">Open walkthrough →</span></a></div></section><section class="landing-group part-2"><h2 class="landing-group-title" style="color: #5fcc8f;">Part 2 — ExcelScript</h2><div class="landing-cards"><a class="landing-card" href="part2_task1.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">01</div><div class="landing-card-label">T1</div><h3 class="landing-card-title">Task 1: BIKE data with ExcelScript</h3><p class="landing-card-summary">## What this task is really about</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part2_task2.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">02</div><div class="landing-card-label">T2</div><h3 class="landing-card-title">Task 2: ExcelScript continued</h3><p class="landing-card-summary">## What this task is really about</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part2_task3.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">03</div><div class="landing-card-label">T3</div><h3 class="landing-card-title">Task 3: ExcelScript finale</h3><p class="landing-card-summary">## What this task is really about</p><span class="landing-card-cta">Open walkthrough →</span></a></div></section>
+  <header class="landing-hero"><h1 class="landing-title">ELE3915 — 2025 Take-Home Exam Walkthroughs</h1><p class="landing-blurb">Interactive companion reports for the ELE3915 take-home exam. Part 1 covers formulas and LAMBDAs on the <code>AIMODEL</code> and <code>MATH</code> datasets. Part 2 covers ExcelScript on the <code>BIKE</code> dataset. Open any report, use the contents sidebar to navigate, and click the reveal buttons at the &ldquo;Pause&rdquo; prompts to test yourself before reading the walkthrough.</p></header><section class="landing-group part-1"><h2 class="landing-group-title" style="color: #43c2c2;">Part 1 — Formulas &amp; LAMBDAs</h2><div class="landing-cards"><a class="landing-card" href="part1_exercise1.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">01</div><div class="landing-card-label">Ex1</div><h3 class="landing-card-title">Exercise 1: AIMODEL analysis with LAMBDA</h3><p class="landing-card-summary">Exercise 1 lives on the AIMODEL sheet of exam_part1.xlsx.</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part1_exercise2.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">02</div><div class="landing-card-label">Ex2</div><h3 class="landing-card-title">Exercise 2: Charts, log axes, and FLOP by year</h3><p class="landing-card-summary">Exercise 2 pivots from pure LAMBDA work into charts.</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part1_exercise3.html" style="--card-accent: #43c2c2;"><div class="landing-card-num">03</div><div class="landing-card-label">Ex3</div><h3 class="landing-card-title">Exercise 3: FINDBEST over the MATH benchmark</h3><p class="landing-card-summary">Exercise 3 moves to the second dataset, MATH, which holds benchmark results on MATH Level 5 — high-school competition math — for a long list of AI models with their release dates.</p><span class="landing-card-cta">Open walkthrough →</span></a></div></section><section class="landing-group part-2"><h2 class="landing-group-title" style="color: #5fcc8f;">Part 2 — ExcelScript</h2><div class="landing-cards"><a class="landing-card" href="part2_task1.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">01</div><div class="landing-card-label">T1</div><h3 class="landing-card-title">Task 1: BIKE data with ExcelScript</h3><p class="landing-card-summary">Task 1 is the groundwork for everything that follows.</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part2_task2.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">02</div><div class="landing-card-label">T2</div><h3 class="landing-card-title">Task 2: ExcelScript continued</h3><p class="landing-card-summary">You have a long daily table (the BIKE table, 730-odd rows, one row per day across 2011 and 2012) and you need a short monthly table (24 rows, one per month) with two columns of averages: average temperature for the mo...</p><span class="landing-card-cta">Open walkthrough →</span></a><a class="landing-card" href="part2_task3.html" style="--card-accent: #5fcc8f;"><div class="landing-card-num">03</div><div class="landing-card-label">T3</div><h3 class="landing-card-title">Task 3: ExcelScript finale</h3><p class="landing-card-summary">You&#x27;ve got the 24-month summary table from Task 2.</p><span class="landing-card-cta">Open walkthrough →</span></a></div></section>
 </div>
+<footer class="site-footer" role="contentinfo"><p class="site-footer-text">Made by Vilijam Cekov (Teaching Assistant) for the course ELE 3915 Excel Programming with Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Ocean Depths theme from the <code>theme-factory</code> palette collection. Excel function references link to the excellent <strong>ExcelJet</strong> reference library.</p><p class="site-footer-link"><a href="https://github.com/Valiant-GitHub/TA-ELE3915-Excel-Programming-with-Automation-2025-exam-walkthrough" target="_blank" rel="noopener">Go to the GitHub Repository &rarr;</a></p></footer>
 <script>
 (function () {
   const navToggle = document.querySelector('.topnav-toggle');
