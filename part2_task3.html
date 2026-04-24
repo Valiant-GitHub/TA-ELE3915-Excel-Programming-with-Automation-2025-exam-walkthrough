@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task 3 — Plotting temperature against users — ELE3915</title>
+<style>
+:root {
+  --accent-current: #5fcc8f;
+}
+
+:root {
+  --navy: #1a2332;
+  --teal-base: #2d8b8b;
+  --teal-brighter: #43c2c2;
+  --teal-darker: #5fcc8f;
+  --seafoam: #a8dadc;
+  --cream: #f1faee;
+  --paper: #fbfdfa;
+  --text: #1a2332;
+  --text-muted: #556070;
+  --border: #d7e0e0;
+  --code-bg: #eef3f3;
+  --code-border: #cbd9d9;
+  --header-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --body-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono-font: 'DejaVu Sans Mono', Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 1, "kern" 1;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+/* ---------- Progress bar ---------- */
+.progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #d4dcdc;
+  z-index: 100;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-current);
+  transition: width 0.08s linear;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-current) 55%, transparent);
+}
+
+.progress-indicator {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 60;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  background: color-mix(in srgb, var(--navy) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-current) 55%, transparent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  min-width: 44px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease;
+}
+
+@media (max-width: 820px) {
+  .progress-indicator {
+    top: 11px;
+    right: 10px;
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
+/* ---------- Top navigation ---------- */
+.topnav {
+  position: sticky;
+  top: 6px;
+  z-index: 50;
+  background: var(--navy);
+  color: var(--cream);
+  padding: 10px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+.topnav-home {
+  color: var(--cream);
+  font-weight: 700;
+  font-family: var(--header-font);
+  text-decoration: none;
+  padding: 4px 12px 4px 4px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border-left: 3px solid var(--seafoam);
+  margin-right: 6px;
+}
+
+.topnav-home:hover { color: var(--seafoam); }
+
+.topnav-logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--cream);        /* drives currentColor on the "BI ..." text */
+  line-height: 0;             /* trim baseline whitespace around the SVG */
+  margin-left: 8px;
+  transition: opacity 0.15s ease;
+}
+
+.topnav-logo svg {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.topnav-home:hover .topnav-logo { opacity: 0.88; }
+
+@media (max-width: 820px) {
+  .topnav-logo svg { height: 26px; }
+}
+
+.topnav-groups {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.topnav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topnav-label {
+  color: #8ea0b8;
+  font-size: 14px;
+  font-family: var(--header-font);
+  letter-spacing: 0.02em;
+}
+
+.topnav-link {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 10px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.topnav-p1 .topnav-link { color: var(--teal-brighter); }
+.topnav-p2 .topnav-link { color: var(--teal-darker); }
+
+.topnav-link:hover {
+  text-decoration: underline;
+}
+
+.topnav-link.is-active {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  font-weight: 700;
+}
+
+.topnav-toggle {
+  display: none;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid #3a4a62;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-size: 14px;
+  margin-left: auto;
+}
+
+@media (max-width: 820px) {
+  .topnav { flex-wrap: wrap; gap: 8px; }
+  .topnav-toggle { display: inline-flex; }
+  .topnav-groups { display: none; width: 100%; flex-direction: column; align-items: flex-start; gap: 12px; padding: 8px 0 2px; }
+  .topnav-groups.is-open { display: flex; }
+  .topnav-group { gap: 6px; flex-wrap: wrap; }
+}
+
+/* ---------- Page layout ---------- */
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 28px 96px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 1024px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.page-header {
+  grid-column: 1 / -1;
+  margin-bottom: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-breadcrumb {
+  font-family: var(--header-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-family: var(--header-font);
+  font-weight: 700;
+  font-size: 2.15rem;
+  margin: 0 0 10px 0;
+  color: var(--navy);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.page-title-rule {
+  width: 44px;
+  height: 3px;
+  background: var(--accent-current);
+  margin: 0 0 14px 0;
+}
+
+.page-header .page-sub {
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ---------- Table of contents ---------- */
+.toc {
+  position: sticky;
+  top: 68px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding: 18px 14px 24px 16px;
+  font-size: 14px;
+  background: var(--navy);
+  color: #b8c6d4;
+  border-left: 3px solid var(--accent-current);
+  box-shadow: 0 4px 18px rgba(26, 35, 50, 0.12);
+}
+
+.toc-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  padding: 0 0 12px 2px;
+  border-bottom: 1px solid #2b3a50;
+  margin-bottom: 8px;
+}
+
+.toc-toggle {
+  display: none;
+  background: var(--navy);
+  border: 1px solid #2b3a50;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-weight: 600;
+  color: var(--cream);
+  width: 100%;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-list li { margin: 0; }
+
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 6px 7px 4px;
+  color: #b8c6d4;
+  text-decoration: none;
+  line-height: 1.3;
+  position: relative;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.toc-marker {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: #6e829a;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.toc-marker-gloss {
+  font-family: var(--header-font);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: #8ea0b8;
+}
+
+.toc-text {
+  flex: 1;
+}
+
+.toc-list a:hover {
+  color: var(--cream);
+  background: color-mix(in srgb, var(--accent-current) 14%, transparent);
+}
+
+.toc-list a:hover .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list .toc-l3 a {
+  padding-left: 34px;
+  font-size: 13px;
+  color: #8696a8;
+}
+
+.toc-list .toc-l3 a:hover { color: var(--cream); }
+
+.toc-list a.is-active {
+  color: var(--accent-current);
+  background: color-mix(in srgb, var(--accent-current) 22%, transparent);
+  font-weight: 600;
+}
+
+.toc-list a.is-active .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list a.is-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-current);
+  box-shadow: 0 0 6px var(--accent-current);
+}
+
+.toc-sublist { list-style: none; margin: 2px 0 2px; padding: 0; }
+
+/* Slim scrollbar for the dark TOC */
+.toc::-webkit-scrollbar { width: 6px; }
+.toc::-webkit-scrollbar-track { background: transparent; }
+.toc::-webkit-scrollbar-thumb {
+  background: #2b3a50;
+  border-radius: 3px;
+}
+.toc::-webkit-scrollbar-thumb:hover { background: #3a4a62; }
+
+@media (max-width: 1024px) {
+  .toc {
+    position: static;
+    max-height: none;
+    padding: 14px 16px 16px;
+    margin-bottom: 24px;
+    border-left: 3px solid var(--accent-current);
+  }
+  .toc-label { display: none; }
+  .toc-toggle { display: block; }
+  .toc-list { display: none; }
+  .toc-list.is-open { display: block; }
+}
+
+/* ---------- Article content ---------- */
+.article-body {
+  max-width: 72ch;
+  counter-reset: section;
+}
+
+.article-body > h2 {
+  counter-increment: section;
+  font-family: var(--header-font);
+  font-size: 1.6rem;
+  margin-top: 3rem;
+  margin-bottom: 0.55rem;
+  padding-top: 1.9rem;
+  line-height: 1.2;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  letter-spacing: -0.005em;
+}
+
+.article-body > h2::before {
+  content: counter(section, decimal-leading-zero);
+  font-family: var(--mono-font);
+  font-size: 0.72em;
+  font-weight: 600;
+  color: var(--accent-current);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.article-body > h2:first-of-type { border-top: none; padding-top: 0.2rem; }
+
+/* Glossary heading — no counter */
+.article-body .glossary-section > h2 {
+  font-family: var(--header-font);
+  font-size: 1.55rem;
+  margin-top: 3rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1.9rem;
+  line-height: 1.25;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+.article-body h3 {
+  font-family: var(--header-font);
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+  color: var(--text);
+  position: relative;
+  padding-left: 18px;
+}
+
+.article-body h3::before {
+  content: "‣";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: color-mix(in srgb, var(--accent-current) 60%, transparent);
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.article-body h4 {
+  font-family: var(--header-font);
+  font-size: 1.04rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--text);
+}
+
+.article-body p {
+  margin: 0.9rem 0;
+}
+
+/* (Drop cap removed per user feedback — felt distracting.) */
+
+.article-body ul,
+.article-body ol {
+  margin: 0.8rem 0;
+  padding-left: 1.6rem;
+}
+
+.article-body li {
+  margin: 0.3rem 0;
+}
+
+.article-body code {
+  font-family: var(--mono-font);
+  font-size: 0.92em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.article-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.article-body a {
+  color: var(--accent-current);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.article-body table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.article-body th,
+.article-body td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.article-body th {
+  background: #eaf0f0;
+  font-family: var(--header-font);
+  font-weight: 700;
+}
+
+/* ---------- Code blocks ---------- */
+.code-block {
+  position: relative;
+  margin: 1.3rem 0 1.4rem;
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent-current);
+  background: #0f1a24;
+  color: #e2e9ea;
+  padding-top: 22px;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 4px 16px 14px;
+  overflow-x: auto;
+  font-family: var(--mono-font);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.code-block code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.code-lang {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--accent-current);
+  color: var(--navy);
+  font-family: var(--header-font);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 3px 10px 4px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #2a3f4d;
+  color: #e2e9ea;
+  border: 1px solid #3a5362;
+  padding: 4px 10px;
+  font-family: var(--header-font);
+  font-size: 12px;
+  cursor: pointer;
+  min-height: 30px;
+  letter-spacing: 0.03em;
+  transition: background-color 0.15s ease;
+}
+
+.copy-btn:hover { background: #355060; }
+.copy-btn.is-copied { background: var(--accent-current); color: var(--navy); border-color: var(--accent-current); }
+
+/* ---------- Reveal blocks (think-before prompts) ---------- */
+.reveal-block {
+  position: relative;
+  margin: 1.8rem 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent-current) 30%, transparent);
+  border-left: 4px solid var(--accent-current);
+  background: #f4f9f9;
+}
+
+.reveal-block::before {
+  content: "?";
+  position: absolute;
+  top: -2px;
+  left: 14px;
+  font-family: var(--header-font);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent-current);
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.reveal-question {
+  padding: 16px 18px 12px 44px;
+  font-size: 1.02rem;
+}
+
+.reveal-question p {
+  margin: 0;
+}
+
+.reveal-btn {
+  margin: 4px 18px 16px 44px;
+  background: var(--accent-current);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  font-family: var(--header-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: filter 0.15s ease;
+}
+
+.reveal-btn:hover {
+  filter: brightness(0.92);
+}
+
+.reveal-content {
+  padding: 2px 18px 14px 44px;
+  border-top: 1px solid color-mix(in srgb, var(--accent-current) 20%, transparent);
+}
+
+/* ---------- Glossary ---------- */
+.glossary-section {
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.glossary-list {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.glossary-list dt {
+  font-family: var(--header-font);
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.glossary-list dd {
+  margin: 0 0 0 0;
+  padding: 0 6px;
+  color: var(--text);
+}
+
+.glossary-list dt.is-flashing,
+.glossary-list dd.is-flashing {
+  background-color: color-mix(in srgb, var(--accent-current) 25%, transparent);
+}
+
+.glossary-link {
+  color: var(--accent-current);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.glossary-link:hover {
+  text-decoration: underline;
+}
+
+.exceljet-link {
+  color: var(--accent-current);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-current);
+}
+
+.exceljet-link:hover {
+  text-decoration: underline;
+  border-bottom: none;
+  text-underline-offset: 3px;
+}
+
+.exceljet-icon {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  margin-left: 2px;
+  text-decoration: none;
+}
+
+.glossary-list dt code .exceljet-link {
+  color: var(--accent-current);
+}
+
+/* ---------- Blockquote (non-reveal) ---------- */
+.article-body blockquote {
+  margin: 1.2rem 0;
+  padding: 0.4rem 1rem;
+  border-left: 3px solid var(--seafoam);
+  color: var(--text-muted);
+  background: #f4f9f9;
+}
+
+/* ---------- Landing page ---------- */
+.landing-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 36px 28px 96px;
+}
+
+.landing-hero {
+  padding: 16px 0 30px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+
+.landing-title {
+  font-family: var(--header-font);
+  font-size: 2.3rem;
+  margin: 0 0 12px;
+  color: var(--navy);
+}
+
+.landing-blurb {
+  max-width: 66ch;
+  color: var(--text);
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.landing-blurb code {
+  font-family: var(--mono-font);
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  font-size: 0.94em;
+}
+
+.landing-group {
+  margin-bottom: 32px;
+}
+
+.landing-group-title {
+  font-family: var(--header-font);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  letter-spacing: 0.01em;
+}
+
+.landing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.landing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--card-accent, var(--teal-base));
+  padding: 20px 20px 22px;
+  background: #fff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  min-height: 210px;
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 35, 50, 0.08);
+  border-color: var(--card-accent);
+}
+
+.landing-card-num {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.landing-card-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.landing-card-title {
+  font-family: var(--header-font);
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.landing-card-summary {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+.landing-card-cta {
+  font-family: var(--header-font);
+  font-size: 14px;
+  color: var(--card-accent);
+  font-weight: 600;
+}
+
+/* ---------- Print fallback ---------- */
+@media print {
+  .topnav, .toc, .progress-bar, .copy-btn, .reveal-btn, .toc-toggle, .topnav-toggle { display: none !important; }
+  .reveal-content { display: block !important; }
+  .page-shell { display: block; }
+}
+
+</style>
+</head>
+<body>
+<div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
+<div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
+<nav class="topnav" aria-label="Primary">
+  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+<g clip-path="url(#clip0_9485_462)">
+<rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
+<rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
+<rect x="30.6932" y="48" width="26.7006" height="4" transform="rotate(-180 30.6932 48)" fill="url(#paint2_linear_9485_462)"/>
+<rect x="3.99261" y="48" width="3.99261" height="46" transform="rotate(-180 3.99261 48)" fill="url(#paint3_linear_9485_462)"/>
+<path d="M13.7246 29.6081H15.3141V18.4104H13.7246V16.25H20.5675C21.7226 16.25 22.5279 16.3376 23.3359 16.664C24.7294 17.2108 25.6884 18.5193 25.6884 20.2444C25.6884 21.6856 24.9917 22.9304 23.7916 23.5621V23.6072C25.5136 24.1301 26.2977 25.6376 26.2977 27.2752C26.2977 29.4356 24.9042 30.9856 23.2247 31.4872C22.4617 31.7049 21.7437 31.75 20.9145 31.75H13.7246V29.6108V29.6081ZM20.8934 22.58C22.1146 22.58 22.7902 21.7281 22.7902 20.5497C22.7902 19.7853 22.5067 19.1085 21.8974 18.782C21.5265 18.6068 21.1132 18.5405 20.5675 18.5405H18.17V22.58H20.8934ZM21.047 29.4568C21.4179 29.4568 21.8312 29.4117 22.157 29.2817C22.9412 28.9552 23.3995 28.082 23.3995 27.1C23.3995 25.7676 22.5703 24.852 21.1556 24.852H18.17V29.4595H21.047V29.4568Z" fill="currentColor"/>
+<path d="M28.1961 29.6104H29.7859V18.4108H28.1961V16.25H34.2559V18.4108H32.6422V29.6104H34.2559V31.75H28.1961V29.6104Z" fill="currentColor"/>
+</g>
+<path d="M59.8891 14H60.912L64.1896 18.8C64.461 19.1974 64.8055 19.8667 64.8055 19.8667H64.8264C64.8264 19.8667 64.7533 19.2078 64.7533 18.8V14H65.7867V21.383H64.7742L61.4861 16.5935C61.2148 16.1856 60.8703 15.5163 60.8703 15.5163H60.8494C60.8494 15.5163 60.9225 16.1752 60.9225 16.5935V21.383H59.8891V14Z" fill="currentColor"/>
+<path d="M69.9281 15.966C71.5042 15.966 72.7777 17.1268 72.7777 18.7268C72.7777 20.3268 71.5042 21.5085 69.9281 21.5085C68.3519 21.5085 67.0784 20.3372 67.0784 18.7268C67.0784 17.1163 68.3519 15.966 69.9281 15.966ZM69.9281 20.6301C70.9301 20.6301 71.7443 19.8353 71.7443 18.7268C71.7443 17.6183 70.9301 16.8444 69.9281 16.8444C68.926 16.8444 68.1118 17.6287 68.1118 18.7268C68.1118 19.8248 68.9364 20.6301 69.9281 20.6301Z" fill="currentColor"/>
+<path d="M73.8528 16.0915H74.834V17.0118C74.834 17.2314 74.8131 17.4091 74.8131 17.4091H74.834C75.0741 16.6353 75.6899 16.0287 76.5041 16.0287C76.6398 16.0287 76.765 16.0497 76.765 16.0497V17.0536C76.765 17.0536 76.6293 17.0222 76.4728 17.0222C75.8256 17.0222 75.2306 17.4823 74.9905 18.2667C74.8966 18.5699 74.8653 18.8941 74.8653 19.2183V21.383H73.8528V16.0915Z" fill="currentColor"/>
+<path d="M77.2765 16.0915H78.3516L79.4476 19.8039C79.5311 20.0758 79.5729 20.3686 79.5833 20.3686H79.6042C79.6042 20.3686 79.6564 20.0758 79.7399 19.8039L80.8881 16.1019H81.8171L82.9549 19.8039C83.0384 20.0758 83.101 20.3686 83.101 20.3686H83.1219C83.1219 20.3686 83.1636 20.0758 83.2471 19.8039L84.3536 16.0915H85.4183L83.7169 21.383H82.6L81.504 17.9843C81.4205 17.7124 81.3578 17.4091 81.3578 17.4091H81.3369C81.3369 17.4091 81.2743 17.7124 81.1908 17.9843L80.1052 21.383H78.9779L77.2765 16.0915Z" fill="currentColor"/>
+<path d="M88.4375 15.966C89.9302 15.966 90.7235 17.0745 90.7235 18.4444C90.7235 18.5804 90.6922 18.8837 90.6922 18.8837H86.8405C86.8927 20.0444 87.7173 20.6301 88.6567 20.6301C89.5962 20.6301 90.2225 20.0131 90.2225 20.0131L90.64 20.7555C90.64 20.7555 89.8571 21.5085 88.5941 21.5085C86.9345 21.5085 85.7967 20.3059 85.7967 18.7372C85.7967 17.0536 86.9345 15.966 88.4375 15.966ZM89.6901 18.1203C89.6588 17.2104 89.0952 16.7712 88.4167 16.7712C87.6443 16.7712 87.018 17.2523 86.8718 18.1203H89.6901Z" fill="currentColor"/>
+<path d="M93.7949 22.7006C94.7135 22.7006 95.465 22.2928 95.465 21.2157V20.8287C95.465 20.6614 95.4755 20.4941 95.4755 20.4941H95.4546C95.1415 21.017 94.6509 21.3203 93.8889 21.3203C92.4171 21.3203 91.5298 20.1386 91.5298 18.6118C91.5298 17.085 92.3753 15.966 93.8367 15.966C95.1101 15.966 95.4964 16.7503 95.4964 16.7503H95.5172C95.5172 16.7503 95.5068 16.6771 95.5068 16.583V16.0915H96.4775V21.1634C96.4775 22.9098 95.1519 23.5791 93.8158 23.5791C93.1791 23.5791 92.5215 23.4013 92.01 23.1399L92.344 22.3451C92.344 22.3451 93.0016 22.7006 93.7949 22.7006ZM95.4859 18.6222C95.4859 17.2418 94.8179 16.8444 93.9933 16.8444C93.0747 16.8444 92.5528 17.5137 92.5528 18.5908C92.5528 19.668 93.1373 20.4418 94.0872 20.4418C94.8179 20.4418 95.4859 20.0026 95.4859 18.6222Z" fill="currentColor"/>
+<path d="M97.8972 14H98.9201V15.0353H97.8972V14ZM97.9076 16.0915H98.9201V21.383H97.9076V16.0915Z" fill="currentColor"/>
+<path d="M103.142 18.0784H103.372V17.9843C103.372 17.1163 102.881 16.8235 102.213 16.8235C101.399 16.8235 100.742 17.3359 100.742 17.3359L100.324 16.5935C100.324 16.5935 101.086 15.966 102.297 15.966C103.633 15.966 104.384 16.698 104.384 18.0366V21.383H103.445V20.881C103.445 20.6405 103.466 20.4627 103.466 20.4627H103.445C103.445 20.4627 103.017 21.5085 101.754 21.5085C100.846 21.5085 99.9587 20.9542 99.9587 19.898C99.9587 18.1516 102.255 18.0784 103.142 18.0784ZM101.973 20.6928C102.829 20.6928 103.382 19.7935 103.382 19.0091V18.8418H103.121C102.359 18.8418 100.982 18.8941 100.982 19.8457C100.982 20.2745 101.316 20.6928 101.973 20.6928Z" fill="currentColor"/>
+<path d="M105.773 16.0915H106.754V16.7921C106.754 17.0013 106.733 17.1791 106.733 17.1791H106.754C106.963 16.7189 107.589 15.966 108.737 15.966C109.979 15.966 110.553 16.6457 110.553 17.9948V21.383H109.541V18.2248C109.541 17.4823 109.384 16.8967 108.539 16.8967C107.693 16.8967 107.088 17.4301 106.869 18.1935C106.806 18.4026 106.785 18.6431 106.785 18.9046V21.383H105.773V16.0915Z" fill="currentColor"/>
+<path d="M59.8891 26.2876H62.4673C63.7095 26.2876 64.6072 26.9778 64.6072 28.1699C64.6072 28.8915 64.2523 29.4667 63.6886 29.7595V29.7804C64.461 30.0105 64.8994 30.7425 64.8994 31.5686C64.8994 32.9595 63.8243 33.6706 62.53 33.6706H59.8891V26.2876ZM62.4673 29.3935C63.1354 29.3935 63.5529 28.9229 63.5529 28.2745C63.5529 27.6262 63.1563 27.1869 62.4465 27.1869H60.9225V29.3935H62.4673ZM62.5822 32.7713C63.3755 32.7713 63.8452 32.2693 63.8452 31.5164C63.8452 30.7634 63.3441 30.251 62.5717 30.251H60.9225V32.7713H62.5822Z" fill="currentColor"/>
+<path d="M66.1337 28.3791H67.1462V31.5373C67.1462 32.2693 67.2924 32.8549 68.1379 32.8549C69.213 32.8549 69.8497 31.9033 69.8497 30.8575V28.3791H70.8622V33.6706H69.881V32.9699C69.881 32.7503 69.9019 32.583 69.9019 32.583H69.881C69.6618 33.1059 68.9729 33.7961 67.9395 33.7961C66.7496 33.7961 66.1337 33.1686 66.1337 31.7673V28.3791Z" fill="currentColor"/>
+<path d="M72.381 32.3007C72.381 32.3007 72.976 32.9177 73.8945 32.9177C74.3329 32.9177 74.7713 32.6876 74.7713 32.2588C74.7713 31.2863 72.0574 31.485 72.0574 29.7595C72.0574 28.7974 72.9133 28.2536 73.9676 28.2536C75.1262 28.2536 75.669 28.8392 75.669 28.8392L75.2619 29.6026C75.2619 29.6026 74.7922 29.132 73.9571 29.132C73.5187 29.132 73.0908 29.3203 73.0908 29.7804C73.0908 30.732 75.8047 30.5229 75.8047 32.2588C75.8047 33.1373 75.0532 33.7961 73.8945 33.7961C72.6002 33.7961 71.8904 33.0222 71.8904 33.0222L72.381 32.3007Z" fill="currentColor"/>
+<path d="M76.859 26.2876H77.882V27.3229H76.859V26.2876ZM76.8694 28.3791H77.882V33.6706H76.8694V28.3791Z" fill="currentColor"/>
+<path d="M79.3015 28.3791H80.2827V29.0797C80.2827 29.2889 80.2618 29.4667 80.2618 29.4667H80.2827C80.4915 29.0065 81.1178 28.2536 82.266 28.2536C83.5081 28.2536 84.0822 28.9333 84.0822 30.2824V33.6706H83.0697V30.5124C83.0697 29.7699 82.9131 29.1843 82.0676 29.1843C81.2221 29.1843 80.6167 29.7177 80.3975 30.4811C80.3349 30.6902 80.314 30.9307 80.314 31.1922V33.6706H79.3015V28.3791Z" fill="currentColor"/>
+<path d="M87.7669 28.2536C89.2596 28.2536 90.0529 29.3621 90.0529 30.732C90.0529 30.868 90.0216 31.1712 90.0216 31.1712H86.1699C86.222 32.332 87.0467 32.9177 87.9861 32.9177C88.9255 32.9177 89.5518 32.3007 89.5518 32.3007L89.9694 33.0431C89.9694 33.0431 89.1865 33.7961 87.9235 33.7961C86.2638 33.7961 85.126 32.5935 85.126 31.0248C85.126 29.3412 86.2638 28.2536 87.7669 28.2536ZM89.0195 30.4079C88.9882 29.498 88.4245 29.0588 87.746 29.0588C86.9736 29.0588 86.3473 29.5399 86.2012 30.4079H89.0195Z" fill="currentColor"/>
+<path d="M91.2324 32.3007C91.2324 32.3007 91.8273 32.9177 92.7459 32.9177C93.1843 32.9177 93.6227 32.6876 93.6227 32.2588C93.6227 31.2863 90.9088 31.485 90.9088 29.7595C90.9088 28.7974 91.7647 28.2536 92.819 28.2536C93.9776 28.2536 94.5204 28.8392 94.5204 28.8392L94.1133 29.6026C94.1133 29.6026 93.6436 29.132 92.8085 29.132C92.3701 29.132 91.9422 29.3203 91.9422 29.7804C91.9422 30.732 94.6561 30.5229 94.6561 32.2588C94.6561 33.1373 93.9045 33.7961 92.7459 33.7961C91.4516 33.7961 90.7418 33.0222 90.7418 33.0222L91.2324 32.3007Z" fill="currentColor"/>
+<path d="M95.7756 32.3007C95.7756 32.3007 96.3705 32.9177 97.2891 32.9177C97.7275 32.9177 98.1659 32.6876 98.1659 32.2588C98.1659 31.2863 95.452 31.485 95.452 29.7595C95.452 28.7974 96.3079 28.2536 97.3622 28.2536C98.5208 28.2536 99.0636 28.8392 99.0636 28.8392L98.6565 29.6026C98.6565 29.6026 98.1868 29.132 97.3517 29.132C96.9133 29.132 96.4854 29.3203 96.4854 29.7804C96.4854 30.732 99.1993 30.5229 99.1993 32.2588C99.1993 33.1373 98.4477 33.7961 97.2891 33.7961C95.9948 33.7961 95.285 33.0222 95.285 33.0222L95.7756 32.3007Z" fill="currentColor"/>
+<path d="M103.302 32.0392C103.302 32.0392 104.084 32.834 105.18 32.834C105.869 32.834 106.454 32.4471 106.454 31.7464C106.454 30.1464 102.884 30.4915 102.884 28.2222C102.884 27.0719 103.876 26.1621 105.264 26.1621C106.652 26.1621 107.352 26.9046 107.352 26.9046L106.882 27.7621C106.882 27.7621 106.203 27.1242 105.264 27.1242C104.481 27.1242 103.928 27.6157 103.928 28.2013C103.928 29.7281 107.498 29.3203 107.498 31.7151C107.498 32.8549 106.621 33.7961 105.16 33.7961C103.594 33.7961 102.717 32.8235 102.717 32.8235L103.302 32.0392Z" fill="currentColor"/>
+<path d="M111.12 28.2536C112.445 28.2536 113.103 29.0275 113.103 29.0275L112.623 29.7386C112.623 29.7386 112.059 29.132 111.161 29.132C110.097 29.132 109.324 29.9268 109.324 31.0144C109.324 32.102 110.097 32.9177 111.193 32.9177C112.174 32.9177 112.821 32.2065 112.821 32.2065L113.228 32.949C113.228 32.949 112.498 33.7961 111.12 33.7961C109.46 33.7961 108.291 32.6144 108.291 31.0248C108.291 29.4353 109.46 28.2536 111.12 28.2536Z" fill="currentColor"/>
+<path d="M114.183 26.2876H115.196V28.9961C115.196 29.2471 115.175 29.4353 115.175 29.4353H115.196C115.425 28.9229 116.094 28.2536 117.148 28.2536C118.39 28.2536 118.964 28.9333 118.964 30.2824V33.6706H117.952V30.5124C117.952 29.77 117.795 29.1843 116.949 29.1843C116.156 29.1843 115.499 29.7281 115.279 30.4915C115.217 30.7007 115.196 30.9412 115.196 31.1922V33.6706H114.183V26.2876Z" fill="currentColor"/>
+<path d="M122.85 28.2536C124.426 28.2536 125.699 29.4144 125.699 31.0144C125.699 32.6144 124.426 33.7961 122.85 33.7961C121.273 33.7961 120 32.6248 120 31.0144C120 29.4039 121.273 28.2536 122.85 28.2536ZM122.85 32.9177C123.852 32.9177 124.666 32.1229 124.666 31.0144C124.666 29.9059 123.852 29.132 122.85 29.132C121.848 29.132 121.033 29.9163 121.033 31.0144C121.033 32.1124 121.858 32.9177 122.85 32.9177Z" fill="currentColor"/>
+<path d="M129.274 28.2536C130.85 28.2536 132.124 29.4144 132.124 31.0144C132.124 32.6144 130.85 33.7961 129.274 33.7961C127.698 33.7961 126.425 32.6248 126.425 31.0144C126.425 29.4039 127.698 28.2536 129.274 28.2536ZM129.274 32.9177C130.276 32.9177 131.091 32.1229 131.091 31.0144C131.091 29.9059 130.276 29.132 129.274 29.132C128.272 29.132 127.458 29.9163 127.458 31.0144C127.458 32.1124 128.283 32.9177 129.274 32.9177Z" fill="currentColor"/>
+<path d="M133.168 26.2876H134.18V32.0497C134.18 32.6876 134.431 32.8026 134.744 32.8026C134.838 32.8026 134.921 32.7922 134.921 32.7922V33.6915C134.921 33.6915 134.765 33.7124 134.587 33.7124C134.013 33.7124 133.168 33.5556 133.168 32.2275V26.2876Z" fill="currentColor"/>
+<defs>
+<linearGradient id="paint0_linear_9485_462" x1="43.9187" y1="0" x2="18.2035" y2="-5.03381" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_9485_462" x1="45.7902" y1="4" x2="45.7787" y2="32.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<linearGradient id="paint2_linear_9485_462" x1="57.3937" y1="48" x2="31.6786" y2="42.9662" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint3_linear_9485_462" x1="5.86415" y1="52" x2="5.8526" y2="80.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<clipPath id="clip0_9485_462">
+<rect width="47.9113" height="48" fill="white"/>
+</clipPath>
+</defs>
+</svg></span></a>
+  <div class="topnav-groups">
+    <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
+      <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
+      <a class="topnav-link" href="part1_exercise2.html">Ex2</a>
+      <a class="topnav-link" href="part1_exercise3.html">Ex3</a>
+    </div>
+    <div class="topnav-group topnav-p2"><span class="topnav-label">Part 2:</span>
+      <a class="topnav-link" href="part2_task1.html">T1</a>
+      <a class="topnav-link" href="part2_task2.html">T2</a>
+      <a class="topnav-link is-active" href="part2_task3.html">T3</a>
+    </div>
+  </div>
+  <button class="topnav-toggle" aria-label="Toggle navigation" type="button">Menu</button>
+</nav>
+<div class="page-shell">
+  <header class="page-header">
+    <div class="page-breadcrumb">Part 2 · Task 3</div>
+    <h1>Task 3 — Plotting temperature against users</h1>
+    <div class="page-title-rule" aria-hidden="true"></div>
+    <p class="page-sub">Task 3: ExcelScript finale</p>
+  </header>
+  <aside class="toc" aria-label="Table of contents">
+  <div class="toc-label">Contents</div>
+  <button class="toc-toggle" type="button" aria-controls="toc-list" aria-expanded="false">Contents</button>
+  <ul id="toc-list" class="toc-list">
+    <li class="toc-l2"><a href="#what-this-task-is-really-about"><span class="toc-marker">01</span><span class="toc-text">What this task is really about</span></a>
+    </li>
+    <li class="toc-l2"><a href="#how-to-read-the-exam-wording"><span class="toc-marker">02</span><span class="toc-text">How to read the exam wording</span></a>
+    </li>
+    <li class="toc-l2"><a href="#the-minimum-viable-click-through-version"><span class="toc-marker">03</span><span class="toc-text">The minimum-viable, click-through version</span></a>
+    </li>
+    <li class="toc-l2"><a href="#two-ways-to-source-the-chart-data"><span class="toc-marker">04</span><span class="toc-text">Two ways to source the chart data</span></a>
+    </li>
+    <li class="toc-l2"><a href="#the-formatting-function"><span class="toc-marker">05</span><span class="toc-text">The formatting function</span></a>
+      <ul class="toc-sublist">
+        <li class="toc-l3"><a href="#title"><span class="toc-text">Title</span></a></li>
+        <li class="toc-l3"><a href="#secondary-axis-the-fix-for-the-scale-mismatch"><span class="toc-text">Secondary axis — the fix for the scale mismatch</span></a></li>
+        <li class="toc-l3"><a href="#legend-position"><span class="toc-text">Legend position</span></a></li>
+        <li class="toc-l3"><a href="#category-axis-configuration"><span class="toc-text">Category axis configuration</span></a></li>
+      </ul>
+    </li>
+    <li class="toc-l2"><a href="#things-that-break"><span class="toc-marker">06</span><span class="toc-text">Things that break</span></a>
+    </li>
+    <li class="toc-l2"><a href="#if-this-still-feels-shaky"><span class="toc-marker">07</span><span class="toc-text">If this still feels shaky</span></a>
+    </li>
+    <li class="toc-l2"><a href="#glossary"><span class="toc-marker toc-marker-gloss">—</span><span class="toc-text">Glossary</span></a>
+    </li>
+  </ul>
+</aside>
+  <main class="article-body">
+    <h2 id="what-this-task-is-really-about">What this task is really about</h2>
+<p>You've got the 24-month summary table from Task 2. Task 3 asks you to plot it — two lines, one for monthly average temperature, one for monthly average user count, against month on the x-<a class="glossary-link" href="#glossary-axis" data-target="glossary-axis">axis</a>. The point of the chart is to let someone see, at a glance, whether users follow temperature (spoiler: they mostly do — warmer months have more riders, with 2012 sitting consistently above 2011 because the scheme grew).</p>
+<p>The tricky bit isn't getting a chart onto the sheet — that's one line. The tricky bit is that the two series live on wildly different scales. Temperatures in Washington DC over two years run roughly 0 to 35 (degrees Celsius). User counts run roughly 1,000 to 7,000. Plot both on the same y-axis and the temperature line flatlines at the bottom while the user line dominates. The fix is a <em><a class="glossary-link" href="#glossary-secondary-axis" data-target="glossary-secondary-axis">secondary axis</a></em> — a second y-axis on the right side of the chart, with its own scale, used only for one of the series. That's most of what the Task 3 code is doing: building a plain line chart, then telling one of its series to use the secondary axis.</p>
+<h2 id="how-to-read-the-exam-wording">How to read the exam wording</h2>
+<p>"A chart which plots the average number of users against the average temperature in each month" is mildly ambiguous. It could mean a scatter plot with temperature on the x-axis and users on the y-axis (an associations chart). Or it could mean a time series — months on the x-axis, two lines showing how each value moves over time. The canonical solution goes with the time-series reading, and the solutions workbook even says at the bottom: "A SCATTER PLOT WOULD ALSO BE AN APPROPRIATE REPRESENTATION OF THIS DATA". Both would earn marks; the canonical choice is a line chart because it shows the seasonal pattern more clearly.</p>
+<p>Before writing a <a class="glossary-link" href="#glossary-method" data-target="glossary-method">method</a>, sketch the target. You want: a line chart, roughly 6 rows high and 6 columns wide, sitting on <code>Questions</code> underneath the monthly-averages table; two line series labelled "Temperature" and "Users"; the x-axis labelled with months from 01/2011 to 12/2012; the temperature line on the left y-axis, the users line on the right y-axis; a title; and the <a class="glossary-link" href="#glossary-legend" data-target="glossary-legend">legend</a> at the bottom so you know which line is which.</p>
+<h2 id="the-minimum-viable-click-through-version">The minimum-viable, click-through version</h2>
+<p>Manual chart: select the 24-row-by-3-column range on the <code>Questions</code> sheet (whichever source you used in Task 2 — the pivot output or the LAMBDA spill) → Insert → 2-D Line. Right-click the second series → Format Data Series → Secondary Axis. Edit the title. Drag the legend to the bottom. That's three minutes.</p>
+<p>The script does the same thing but reproducibly. The real reason to script it is that the chart's placement and the axis settings are fiddly; re-clicking after every change to the data is what scripts avoid.</p>
+<h2 id="two-ways-to-source-the-chart-data">Two ways to source the chart data</h2>
+<p>The canonical solution has two functions for the chart itself — <code>Q3chartFormula</code> and <code>Q3chartPTable</code> — and <code>main</code> calls the formula version:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">// let chart = Q3chartPTable(Qs);
+let chart = Q3chartFormula(Qs);
+Q3chartFormat(chart);
+</code></pre></div>
+<p>The comment-out tells you the author's intent: pick one. Both produce a chart. What changes is where the chart reads its numbers from.</p>
+<p><strong>Formula source:</strong></p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">function Q3chartFormula(Qs: ExcelScript.Worksheet) {
+    let data = Qs.getCell(19, 5).getSurroundingRegion();
+    let chart = Qs.addChart(ExcelScript.ChartType.line, data);
+    chart.setPosition(&quot;B53&quot;, &quot;H72&quot;);
+    return chart;
+}
+</code></pre></div>
+<p><code>getCell(19, 5)</code> is <code>F20</code> in Excel's 1-based addressing — the top-left of the LAMBDA spill. <code>getSurroundingRegion()</code> expands that single cell to the whole contiguous filled block, which is the header row plus the 24 data rows. The chart takes that block and reads columns in order: the first column becomes the <a class="glossary-link" href="#glossary-category-axis" data-target="glossary-category-axis">category axis</a>, each remaining column becomes a series.</p>
+<p><strong>Pivot source:</strong></p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">function Q3chartPTable(Qs: ExcelScript.Worksheet) {
+    let pTable = Qs.getPivotTable(&quot;Q2MonthlyAverages&quot;);
+    let data = pTable.getLayout().getRange();
+    let chart = Qs.addChart(ExcelScript.ChartType.line, data);
+    chart.setPosition(&quot;B53&quot;, &quot;H72&quot;);
+    return chart;
+}
+</code></pre></div>
+<p>Same mechanics, different source. <code>getPivotTable</code> looks up the pivot by name; <code>getLayout().getRange()</code> returns the rectangular range the pivot currently occupies.</p>
+<p>Which one to pick? The pivot source re-reads the pivot cache, which doesn't update when the dropdown changes unless you refresh. The formula source reads the LAMBDA output, which is live. If you built only the pivot in Task 2 (and nothing else), use the pivot source. If you built the LAMBDA, prefer the formula source because the chart will react to the dropdown without a refresh step. The canonical script reflects this trade-off by defaulting to the formula version.</p>
+<p><em>Methods used: <code>getCell</code>, <code>getSurroundingRegion</code>, <code>addChart</code>, <code>setPosition</code>, <code>getPivotTable</code>, <code>getLayout</code>, <code>getRange</code> — see range.pdf, table_chart.pdf, and pivottable.pdf.</em></p>
+<p>A <em><a class="glossary-link" href="#glossary-chart-series" data-target="glossary-chart-series">chart series</a></em> is one line in the chart — the points plus the line connecting them. Each column of numeric data gives you one series. For this chart there are two series: the temperature column (series index 0) and the users column (series index 1). An <em>axis</em> is the line running along the edge of the <a class="glossary-link" href="#glossary-plot-area" data-target="glossary-plot-area">plot area</a> with tick marks; the <em>category axis</em> is the x-axis in a line chart (the months here), and the <em><a class="glossary-link" href="#glossary-value-axis" data-target="glossary-value-axis">value axis</a></em> is the y-axis.</p>
+<p>A note on <code>setPosition</code>. It takes two cell addresses as strings and pins the chart between them — the top-left corner sits on the first cell, the bottom-right on the second. <code>"B53"</code> to <code>"H72"</code> is 6 columns wide and 20 rows tall, which is a reasonable landscape aspect ratio. You can move it later by clicking and dragging in the GUI; the script just gives it a starting home.</p>
+<h2 id="the-formatting-function">The formatting function</h2>
+<p><code>Q3chartFormat</code> does the interesting work. Four things: title the chart, put the users series on a secondary axis, move the legend, and configure the x-axis. Take them in order.</p>
+<h3 id="title">Title</h3>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">chart.getTitle().setText(&quot;Temperature vs. Users&quot;);
+</code></pre></div>
+<p><code>getTitle()</code> returns the chart's title object (charts always have one, though it can be hidden); <code>setText</code> sets what it shows. The title sits above the plot area by default.</p>
+<h3 id="secondary-axis-the-fix-for-the-scale-mismatch">Secondary axis — the fix for the scale mismatch</h3>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>If you plot temperature (range 0–35) and users (range 1000–7000) on the same y-axis, what happens to the temperature line?</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The temperature line gets squashed flat against the bottom of the plot — a 35-unit range looks like a thin ribbon on an axis scaled to 7000. You lose almost all the seasonal shape. Putting one of the two series on its own axis restores the visibility.</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">chart.getSeries()[1].setAxisGroup(ExcelScript.ChartAxisGroup.secondary);
+</code></pre></div>
+<p><code>getSeries()</code> returns the array of series. <code>[1]</code> is the second series — in this chart, the users series, because <code>Users</code> is the third column in the source range and the first column becomes the x-axis. <code>setAxisGroup</code> changes which axis group the series draws against; <code>ChartAxisGroup.secondary</code> means "the right-hand axis". Excel creates the secondary axis automatically the first time something uses it.</p></div></div>
+<p>This raises a question the canonical solution doesn't address: which series should go on the secondary axis? It's a style call, not a correctness one. The canonical puts users on the right (because series index 1 is users) and temperature on the left. An equally valid choice would be temperature on the right (maybe because you want the chart to read as "a visualization of users, with temperature for context"). Either way, the secondary-axis technique is the same.</p>
+<p>Without any further setup, Excel will label the left axis with temperature's scale and the right axis with users' scale. A final polish — not in the canonical code — would be to title each axis so the reader knows which is which: <code>chart.getAxes().getValueAxis(ExcelScript.ChartAxisGroup.primary).getTitle().setText("Temperature (°C)")</code> and similar for the secondary. Consider it if you have time, skip it if not.</p>
+<h3 id="legend-position">Legend position</h3>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">chart.getLegend().setPosition(&quot;bottom&quot;);
+</code></pre></div>
+<p>The default legend position in Excel is right-of-plot, which works for short series lists but crowds the chart when two axes are active. "Bottom" frees up horizontal space. <code>setPosition</code> accepts string values like <code>"top"</code>, <code>"bottom"</code>, <code>"left"</code>, <code>"right"</code>; the ExcelScript docs enumerate them under <code>ChartLegendPosition</code>.</p>
+<p>Aside on the comment in the canonical script: there's a line reading <code>// Remove legend</code> immediately above <code>chart.getLegend().setPosition("bottom")</code>. The code doesn't actually remove it — <code>setVisible(false)</code> would do that. The comment is misleading. The actual behaviour is move-to-bottom.</p>
+<h3 id="category-axis-configuration">Category axis configuration</h3>
+<p>The longest chunk in this function:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">let xAxis = chart.getAxes().getCategoryAxis();
+xAxis.setCategoryType(ExcelScript.ChartAxisCategoryType.dateAxis);
+xAxis.getTitle().setVisible(false);
+xAxis.setTickLabelPosition(ExcelScript.ChartAxisTickLabelPosition.low);
+xAxis.setMajorUnit(2);
+</code></pre></div>
+<p>Take the methods one by one.</p>
+<p><code>getAxes()</code> returns the axis collection; <code>getCategoryAxis()</code> reaches the x-axis (for line charts it's the horizontal one).</p>
+<p><code>setCategoryType(ExcelScript.ChartAxisCategoryType.dateAxis)</code> is the key line. By default, when Excel sees strings like "01/2011" coming in as categories, it treats them as plain labels — equal-width spacing between each. Tell it <code>dateAxis</code> and it treats the category values as real dates, spaced proportionally on a timeline. With daily data this matters a lot; with evenly-spaced monthly data it matters less visually but is still the correct choice, and it's what lets <code>setMajorUnit(2)</code> mean "every 2 months".</p>
+<p><code>xAxis.getTitle().setVisible(false)</code> hides the x-axis title. By default it might read something like "MonthYear" or be empty — either way, 24 date labels along the bottom make the category self-explanatory, so the extra word "MonthYear" is clutter.</p>
+<p><code>setTickLabelPosition(ExcelScript.ChartAxisTickLabelPosition.low)</code> pins the tick labels at the bottom of the plot. If you leave this alone Excel sometimes decides to draw the labels next to the axis origin, which on a chart with a secondary axis can put the date labels floating in mid-plot. Forcing <code>low</code> keeps them glued to the bottom edge regardless.</p>
+<p><code>setMajorUnit(2)</code> sets the gap between labelled tick marks. For a date axis the unit depends on the base time unit — here, months — so <code>2</code> means "one label every two months". With 24 months of data you get 12 labels, which is readable. Without this, Excel auto-picks — often one per month (cluttered) or one per year (too sparse).</p>
+<p><em>Methods used: <code>getTitle</code>, <code>setText</code>, <code>getSeries</code>, <code>setAxisGroup</code>, <code>getLegend</code>, <code>setPosition</code>, <code>getAxes</code>, <code>getCategoryAxis</code>, <code>setCategoryType</code>, <code>setVisible</code>, <code>setTickLabelPosition</code>, <code>setMajorUnit</code> — see table_chart.pdf. The enums <code>ChartAxisGroup</code>, <code>ChartAxisCategoryType</code>, <code>ChartAxisTickLabelPosition</code> live in the ExcelScript API docs; 06ExcelScriptAPI.pdf introduces the pattern.</em></p>
+<h2 id="things-that-break">Things that break</h2>
+<p>The single most common failure: calling <code>Q3chartFormat(chart)</code> before any series exists. If your source range is accidentally a single cell, <code>addChart</code> still makes a chart but with zero series, and then <code>chart.getSeries()[1]</code> throws because index 1 doesn't exist. Check the source range is what you think before formatting.</p>
+<p>The second most common: the pivot isn't refreshed, so the chart reads stale numbers. Fix by running <code>pTable.refresh()</code> before building the chart, or by switching to the formula source.</p>
+<p>The third: the user types a different dropdown option, the pivot doesn't refresh, and the users line now reflects the old dropdown. Same fix as above — refresh the pivot, or source the chart from the formula.</p>
+<h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
+<p>02Charts.pdf is the main lecture on chart construction and why secondary axes exist. table_chart.pdf is the method cheatsheet — scroll to the Chart section for the full list of getters and setters used here. 06ExcelScriptAPI.pdf walks through enums in general, which is useful if the <code>ExcelScript.ChartAxisGroup.secondary</code> pattern still feels opaque. If you want the clearest reason behind each formatting choice, open the solutions workbook and temporarily delete each formatting line one at a time — you'll see exactly what each one was doing.</p>
+    <section class="glossary-section" id="glossary">
+<h2 id="glossary-heading">Glossary</h2>
+<dl class="glossary-list">
+<dt id="glossary-axis"><strong>Axis</strong></dt><dd><p>the line along an edge of the plot area, with tick marks and labels. Every 2-D chart has at least two: a category axis and a value axis.</p></dd>
+<dt id="glossary-category-axis"><strong>Category axis</strong></dt><dd><p>the axis showing categories or (when <code>dateAxis</code> is set) dates. Usually horizontal. In this chart, the months.</p></dd>
+<dt id="glossary-chart-series"><strong>Chart series</strong></dt><dd><p>one of the data sets plotted on the chart; one line per series for a line chart. This chart has two series: Temperature (index 0) and Users (index 1).</p></dd>
+<dt id="glossary-class"><strong>Class</strong></dt><dd><p>(TypeScript) — a blueprint for objects with methods. <code>ExcelScript.Chart</code> is a class; <code>chart</code> in the script is an instance of it.</p></dd>
+<dt id="glossary-enum"><strong>Enum</strong></dt><dd><p>a fixed, named list of constants. <code>ExcelScript.ChartType.line</code>, <code>ExcelScript.ChartAxisGroup.secondary</code>, and <code>ExcelScript.ChartAxisCategoryType.dateAxis</code> are enum members. Using enums avoids typos in string arguments.</p></dd>
+<dt id="glossary-function-signature"><strong>Function signature</strong></dt><dd><p>the pattern showing what a function takes and returns, like <code>addChart(chartType, sourceData) → Chart</code>. You can find these in the cheatsheets.</p></dd>
+<dt id="glossary-interface"><strong>Interface</strong></dt><dd><p>(TypeScript) — a description of the shape an object must have. <code>ExcelScript.ListDataValidation</code> is an interface that says "any object used as this type must have an <code>inCellDropDown</code> field and a <code>source</code> field". Not shown in Task 3 code but mentioned for completeness.</p></dd>
+<dt id="glossary-legend"><strong>Legend</strong></dt><dd><p>the small box mapping series colours to series names. <code>chart.getLegend().setPosition("bottom")</code> moves it below the plot.</p></dd>
+<dt id="glossary-major-unit"><strong>Major unit</strong></dt><dd><p>the spacing between labelled tick marks on an axis. <code>setMajorUnit(2)</code> on a date axis means one label every two months.</p></dd>
+<dt id="glossary-method"><strong>Method</strong></dt><dd><p>a function attached to an object, called with a dot. <code>chart.setPosition(...)</code> calls the <code>setPosition</code> method on the <code>chart</code> object.</p></dd>
+<dt id="glossary-object-typescript"><strong>Object (TypeScript)</strong></dt><dd><p>a bundle of fields and methods. The script creates several: <code>chart</code>, <code>xAxis</code>, <code>pTable</code>.</p></dd>
+<dt id="glossary-plot-area"><strong>Plot area</strong></dt><dd><p>the inner rectangle of the chart where lines/bars actually live, bounded by the axes.</p></dd>
+<dt id="glossary-secondary-axis"><strong>Secondary axis</strong></dt><dd><p>an extra value axis on the opposite side of the plot (right by default), used for series with a scale wildly different from the main series. Turned on by setting a series' axis group to <code>secondary</code>.</p></dd>
+<dt id="glossary-tick-label"><strong>Tick label</strong></dt><dd><p>the number or text written next to a tick mark on an axis. <code>setTickLabelPosition</code> controls where these labels sit.</p></dd>
+<dt id="glossary-trendline"><strong>Trendline</strong></dt><dd><p>a smoothed line Excel can add over a series to show a trend. Not used here, but you might have seen the option in the GUI.</p></dd>
+<dt id="glossary-value-axis"><strong>Value axis</strong></dt><dd><p>the numeric axis. Usually vertical. A secondary axis is also a value axis, just on the other side of the plot.</p></dd>
+</dl></section>
+  </main>
+</div>
+<script>
+(function () {
+  const bar = document.querySelector('.progress-bar');
+  const indicator = document.querySelector('.progress-indicator');
+  function onScroll() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (bar) bar.style.width = p + '%';
+    if (indicator) indicator.textContent = Math.round(p) + '%';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  onScroll();
+
+  document.querySelectorAll('.reveal-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const id = btn.getAttribute('data-target');
+      const content = document.getElementById(id);
+      if (!content) return;
+      content.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.style.display = 'none';
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const container = btn.closest('.code-block');
+      if (!container) return;
+      const pre = container.querySelector('pre');
+      if (!pre) return;
+      const text = pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      const orig = btn.textContent;
+      btn.textContent = 'Copied';
+      btn.classList.add('is-copied');
+      setTimeout(function () {
+        btn.textContent = orig;
+        btn.classList.remove('is-copied');
+      }, 1500);
+    });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const idToLink = {};
+  tocLinks.forEach(function (a) {
+    const href = a.getAttribute('href');
+    if (href && href.charAt(0) === '#') idToLink[href.slice(1)] = a;
+  });
+  const headings = document.querySelectorAll('.article-body > h2, .article-body h3, .glossary-section h2');
+  if ('IntersectionObserver' in window && headings.length) {
+    let active = null;
+    const visible = new Set();
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) visible.add(e.target.id);
+        else visible.delete(e.target.id);
+      });
+      let earliest = null;
+      headings.forEach(function (h) {
+        if (visible.has(h.id) && !earliest) earliest = h.id;
+      });
+      if (!earliest && headings.length) {
+        let nearest = null;
+        headings.forEach(function (h) {
+          const top = h.getBoundingClientRect().top;
+          if (top < 120) nearest = h.id;
+        });
+        earliest = nearest;
+      }
+      if (earliest && earliest !== active) {
+        if (active && idToLink[active]) idToLink[active].classList.remove('is-active');
+        active = earliest;
+        if (idToLink[active]) idToLink[active].classList.add('is-active');
+      }
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    headings.forEach(function (h) { obs.observe(h); });
+  }
+
+  const tocToggle = document.querySelector('.toc-toggle');
+  const tocList = document.querySelector('.toc-list');
+  if (tocToggle && tocList) {
+    tocToggle.addEventListener('click', function () {
+      const open = tocList.classList.toggle('is-open');
+      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  const navToggle = document.querySelector('.topnav-toggle');
+  const navGroups = document.querySelector('.topnav-groups');
+  if (navToggle && navGroups) {
+    navToggle.addEventListener('click', function () {
+      navGroups.classList.toggle('is-open');
+    });
+  }
+
+  function flash(el) {
+    if (!el) return;
+    el.classList.add('is-flashing');
+    const dd = el.nextElementSibling;
+    if (dd && dd.tagName === 'DD') dd.classList.add('is-flashing');
+    setTimeout(function () {
+      el.classList.remove('is-flashing');
+      if (dd && dd.tagName === 'DD') dd.classList.remove('is-flashing');
+    }, 1500);
+  }
+  document.querySelectorAll('.glossary-link').forEach(function (a) {
+    a.addEventListener('click', function () {
+      const id = a.getAttribute('data-target');
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        setTimeout(function () { flash(target); }, 300);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

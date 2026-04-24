@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercise 3 — FINDBEST over the MATH benchmark — ELE3915</title>
+<style>
+:root {
+  --accent-current: #43c2c2;
+}
+
+:root {
+  --navy: #1a2332;
+  --teal-base: #2d8b8b;
+  --teal-brighter: #43c2c2;
+  --teal-darker: #5fcc8f;
+  --seafoam: #a8dadc;
+  --cream: #f1faee;
+  --paper: #fbfdfa;
+  --text: #1a2332;
+  --text-muted: #556070;
+  --border: #d7e0e0;
+  --code-bg: #eef3f3;
+  --code-border: #cbd9d9;
+  --header-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --body-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono-font: 'DejaVu Sans Mono', Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 1, "kern" 1;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+/* ---------- Progress bar ---------- */
+.progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #d4dcdc;
+  z-index: 100;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-current);
+  transition: width 0.08s linear;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-current) 55%, transparent);
+}
+
+.progress-indicator {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 60;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  background: color-mix(in srgb, var(--navy) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-current) 55%, transparent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  min-width: 44px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease;
+}
+
+@media (max-width: 820px) {
+  .progress-indicator {
+    top: 11px;
+    right: 10px;
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
+/* ---------- Top navigation ---------- */
+.topnav {
+  position: sticky;
+  top: 6px;
+  z-index: 50;
+  background: var(--navy);
+  color: var(--cream);
+  padding: 10px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+.topnav-home {
+  color: var(--cream);
+  font-weight: 700;
+  font-family: var(--header-font);
+  text-decoration: none;
+  padding: 4px 12px 4px 4px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border-left: 3px solid var(--seafoam);
+  margin-right: 6px;
+}
+
+.topnav-home:hover { color: var(--seafoam); }
+
+.topnav-logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--cream);        /* drives currentColor on the "BI ..." text */
+  line-height: 0;             /* trim baseline whitespace around the SVG */
+  margin-left: 8px;
+  transition: opacity 0.15s ease;
+}
+
+.topnav-logo svg {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.topnav-home:hover .topnav-logo { opacity: 0.88; }
+
+@media (max-width: 820px) {
+  .topnav-logo svg { height: 26px; }
+}
+
+.topnav-groups {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.topnav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topnav-label {
+  color: #8ea0b8;
+  font-size: 14px;
+  font-family: var(--header-font);
+  letter-spacing: 0.02em;
+}
+
+.topnav-link {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 10px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.topnav-p1 .topnav-link { color: var(--teal-brighter); }
+.topnav-p2 .topnav-link { color: var(--teal-darker); }
+
+.topnav-link:hover {
+  text-decoration: underline;
+}
+
+.topnav-link.is-active {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  font-weight: 700;
+}
+
+.topnav-toggle {
+  display: none;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid #3a4a62;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-size: 14px;
+  margin-left: auto;
+}
+
+@media (max-width: 820px) {
+  .topnav { flex-wrap: wrap; gap: 8px; }
+  .topnav-toggle { display: inline-flex; }
+  .topnav-groups { display: none; width: 100%; flex-direction: column; align-items: flex-start; gap: 12px; padding: 8px 0 2px; }
+  .topnav-groups.is-open { display: flex; }
+  .topnav-group { gap: 6px; flex-wrap: wrap; }
+}
+
+/* ---------- Page layout ---------- */
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 28px 96px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 1024px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.page-header {
+  grid-column: 1 / -1;
+  margin-bottom: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-breadcrumb {
+  font-family: var(--header-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-family: var(--header-font);
+  font-weight: 700;
+  font-size: 2.15rem;
+  margin: 0 0 10px 0;
+  color: var(--navy);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.page-title-rule {
+  width: 44px;
+  height: 3px;
+  background: var(--accent-current);
+  margin: 0 0 14px 0;
+}
+
+.page-header .page-sub {
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ---------- Table of contents ---------- */
+.toc {
+  position: sticky;
+  top: 68px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding: 18px 14px 24px 16px;
+  font-size: 14px;
+  background: var(--navy);
+  color: #b8c6d4;
+  border-left: 3px solid var(--accent-current);
+  box-shadow: 0 4px 18px rgba(26, 35, 50, 0.12);
+}
+
+.toc-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  padding: 0 0 12px 2px;
+  border-bottom: 1px solid #2b3a50;
+  margin-bottom: 8px;
+}
+
+.toc-toggle {
+  display: none;
+  background: var(--navy);
+  border: 1px solid #2b3a50;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-weight: 600;
+  color: var(--cream);
+  width: 100%;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-list li { margin: 0; }
+
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 6px 7px 4px;
+  color: #b8c6d4;
+  text-decoration: none;
+  line-height: 1.3;
+  position: relative;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.toc-marker {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: #6e829a;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.toc-marker-gloss {
+  font-family: var(--header-font);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: #8ea0b8;
+}
+
+.toc-text {
+  flex: 1;
+}
+
+.toc-list a:hover {
+  color: var(--cream);
+  background: color-mix(in srgb, var(--accent-current) 14%, transparent);
+}
+
+.toc-list a:hover .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list .toc-l3 a {
+  padding-left: 34px;
+  font-size: 13px;
+  color: #8696a8;
+}
+
+.toc-list .toc-l3 a:hover { color: var(--cream); }
+
+.toc-list a.is-active {
+  color: var(--accent-current);
+  background: color-mix(in srgb, var(--accent-current) 22%, transparent);
+  font-weight: 600;
+}
+
+.toc-list a.is-active .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list a.is-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-current);
+  box-shadow: 0 0 6px var(--accent-current);
+}
+
+.toc-sublist { list-style: none; margin: 2px 0 2px; padding: 0; }
+
+/* Slim scrollbar for the dark TOC */
+.toc::-webkit-scrollbar { width: 6px; }
+.toc::-webkit-scrollbar-track { background: transparent; }
+.toc::-webkit-scrollbar-thumb {
+  background: #2b3a50;
+  border-radius: 3px;
+}
+.toc::-webkit-scrollbar-thumb:hover { background: #3a4a62; }
+
+@media (max-width: 1024px) {
+  .toc {
+    position: static;
+    max-height: none;
+    padding: 14px 16px 16px;
+    margin-bottom: 24px;
+    border-left: 3px solid var(--accent-current);
+  }
+  .toc-label { display: none; }
+  .toc-toggle { display: block; }
+  .toc-list { display: none; }
+  .toc-list.is-open { display: block; }
+}
+
+/* ---------- Article content ---------- */
+.article-body {
+  max-width: 72ch;
+  counter-reset: section;
+}
+
+.article-body > h2 {
+  counter-increment: section;
+  font-family: var(--header-font);
+  font-size: 1.6rem;
+  margin-top: 3rem;
+  margin-bottom: 0.55rem;
+  padding-top: 1.9rem;
+  line-height: 1.2;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  letter-spacing: -0.005em;
+}
+
+.article-body > h2::before {
+  content: counter(section, decimal-leading-zero);
+  font-family: var(--mono-font);
+  font-size: 0.72em;
+  font-weight: 600;
+  color: var(--accent-current);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.article-body > h2:first-of-type { border-top: none; padding-top: 0.2rem; }
+
+/* Glossary heading — no counter */
+.article-body .glossary-section > h2 {
+  font-family: var(--header-font);
+  font-size: 1.55rem;
+  margin-top: 3rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1.9rem;
+  line-height: 1.25;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+.article-body h3 {
+  font-family: var(--header-font);
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+  color: var(--text);
+  position: relative;
+  padding-left: 18px;
+}
+
+.article-body h3::before {
+  content: "‣";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: color-mix(in srgb, var(--accent-current) 60%, transparent);
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.article-body h4 {
+  font-family: var(--header-font);
+  font-size: 1.04rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--text);
+}
+
+.article-body p {
+  margin: 0.9rem 0;
+}
+
+/* (Drop cap removed per user feedback — felt distracting.) */
+
+.article-body ul,
+.article-body ol {
+  margin: 0.8rem 0;
+  padding-left: 1.6rem;
+}
+
+.article-body li {
+  margin: 0.3rem 0;
+}
+
+.article-body code {
+  font-family: var(--mono-font);
+  font-size: 0.92em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.article-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.article-body a {
+  color: var(--accent-current);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.article-body table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.article-body th,
+.article-body td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.article-body th {
+  background: #eaf0f0;
+  font-family: var(--header-font);
+  font-weight: 700;
+}
+
+/* ---------- Code blocks ---------- */
+.code-block {
+  position: relative;
+  margin: 1.3rem 0 1.4rem;
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent-current);
+  background: #0f1a24;
+  color: #e2e9ea;
+  padding-top: 22px;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 4px 16px 14px;
+  overflow-x: auto;
+  font-family: var(--mono-font);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.code-block code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.code-lang {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--accent-current);
+  color: var(--navy);
+  font-family: var(--header-font);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 3px 10px 4px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #2a3f4d;
+  color: #e2e9ea;
+  border: 1px solid #3a5362;
+  padding: 4px 10px;
+  font-family: var(--header-font);
+  font-size: 12px;
+  cursor: pointer;
+  min-height: 30px;
+  letter-spacing: 0.03em;
+  transition: background-color 0.15s ease;
+}
+
+.copy-btn:hover { background: #355060; }
+.copy-btn.is-copied { background: var(--accent-current); color: var(--navy); border-color: var(--accent-current); }
+
+/* ---------- Reveal blocks (think-before prompts) ---------- */
+.reveal-block {
+  position: relative;
+  margin: 1.8rem 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent-current) 30%, transparent);
+  border-left: 4px solid var(--accent-current);
+  background: #f4f9f9;
+}
+
+.reveal-block::before {
+  content: "?";
+  position: absolute;
+  top: -2px;
+  left: 14px;
+  font-family: var(--header-font);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent-current);
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.reveal-question {
+  padding: 16px 18px 12px 44px;
+  font-size: 1.02rem;
+}
+
+.reveal-question p {
+  margin: 0;
+}
+
+.reveal-btn {
+  margin: 4px 18px 16px 44px;
+  background: var(--accent-current);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  font-family: var(--header-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: filter 0.15s ease;
+}
+
+.reveal-btn:hover {
+  filter: brightness(0.92);
+}
+
+.reveal-content {
+  padding: 2px 18px 14px 44px;
+  border-top: 1px solid color-mix(in srgb, var(--accent-current) 20%, transparent);
+}
+
+/* ---------- Glossary ---------- */
+.glossary-section {
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.glossary-list {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.glossary-list dt {
+  font-family: var(--header-font);
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.glossary-list dd {
+  margin: 0 0 0 0;
+  padding: 0 6px;
+  color: var(--text);
+}
+
+.glossary-list dt.is-flashing,
+.glossary-list dd.is-flashing {
+  background-color: color-mix(in srgb, var(--accent-current) 25%, transparent);
+}
+
+.glossary-link {
+  color: var(--accent-current);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.glossary-link:hover {
+  text-decoration: underline;
+}
+
+.exceljet-link {
+  color: var(--accent-current);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-current);
+}
+
+.exceljet-link:hover {
+  text-decoration: underline;
+  border-bottom: none;
+  text-underline-offset: 3px;
+}
+
+.exceljet-icon {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  margin-left: 2px;
+  text-decoration: none;
+}
+
+.glossary-list dt code .exceljet-link {
+  color: var(--accent-current);
+}
+
+/* ---------- Blockquote (non-reveal) ---------- */
+.article-body blockquote {
+  margin: 1.2rem 0;
+  padding: 0.4rem 1rem;
+  border-left: 3px solid var(--seafoam);
+  color: var(--text-muted);
+  background: #f4f9f9;
+}
+
+/* ---------- Landing page ---------- */
+.landing-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 36px 28px 96px;
+}
+
+.landing-hero {
+  padding: 16px 0 30px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+
+.landing-title {
+  font-family: var(--header-font);
+  font-size: 2.3rem;
+  margin: 0 0 12px;
+  color: var(--navy);
+}
+
+.landing-blurb {
+  max-width: 66ch;
+  color: var(--text);
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.landing-blurb code {
+  font-family: var(--mono-font);
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  font-size: 0.94em;
+}
+
+.landing-group {
+  margin-bottom: 32px;
+}
+
+.landing-group-title {
+  font-family: var(--header-font);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  letter-spacing: 0.01em;
+}
+
+.landing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.landing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--card-accent, var(--teal-base));
+  padding: 20px 20px 22px;
+  background: #fff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  min-height: 210px;
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 35, 50, 0.08);
+  border-color: var(--card-accent);
+}
+
+.landing-card-num {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.landing-card-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.landing-card-title {
+  font-family: var(--header-font);
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.landing-card-summary {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+.landing-card-cta {
+  font-family: var(--header-font);
+  font-size: 14px;
+  color: var(--card-accent);
+  font-weight: 600;
+}
+
+/* ---------- Print fallback ---------- */
+@media print {
+  .topnav, .toc, .progress-bar, .copy-btn, .reveal-btn, .toc-toggle, .topnav-toggle { display: none !important; }
+  .reveal-content { display: block !important; }
+  .page-shell { display: block; }
+}
+
+</style>
+</head>
+<body>
+<div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
+<div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
+<nav class="topnav" aria-label="Primary">
+  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+<g clip-path="url(#clip0_9485_462)">
+<rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
+<rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
+<rect x="30.6932" y="48" width="26.7006" height="4" transform="rotate(-180 30.6932 48)" fill="url(#paint2_linear_9485_462)"/>
+<rect x="3.99261" y="48" width="3.99261" height="46" transform="rotate(-180 3.99261 48)" fill="url(#paint3_linear_9485_462)"/>
+<path d="M13.7246 29.6081H15.3141V18.4104H13.7246V16.25H20.5675C21.7226 16.25 22.5279 16.3376 23.3359 16.664C24.7294 17.2108 25.6884 18.5193 25.6884 20.2444C25.6884 21.6856 24.9917 22.9304 23.7916 23.5621V23.6072C25.5136 24.1301 26.2977 25.6376 26.2977 27.2752C26.2977 29.4356 24.9042 30.9856 23.2247 31.4872C22.4617 31.7049 21.7437 31.75 20.9145 31.75H13.7246V29.6108V29.6081ZM20.8934 22.58C22.1146 22.58 22.7902 21.7281 22.7902 20.5497C22.7902 19.7853 22.5067 19.1085 21.8974 18.782C21.5265 18.6068 21.1132 18.5405 20.5675 18.5405H18.17V22.58H20.8934ZM21.047 29.4568C21.4179 29.4568 21.8312 29.4117 22.157 29.2817C22.9412 28.9552 23.3995 28.082 23.3995 27.1C23.3995 25.7676 22.5703 24.852 21.1556 24.852H18.17V29.4595H21.047V29.4568Z" fill="currentColor"/>
+<path d="M28.1961 29.6104H29.7859V18.4108H28.1961V16.25H34.2559V18.4108H32.6422V29.6104H34.2559V31.75H28.1961V29.6104Z" fill="currentColor"/>
+</g>
+<path d="M59.8891 14H60.912L64.1896 18.8C64.461 19.1974 64.8055 19.8667 64.8055 19.8667H64.8264C64.8264 19.8667 64.7533 19.2078 64.7533 18.8V14H65.7867V21.383H64.7742L61.4861 16.5935C61.2148 16.1856 60.8703 15.5163 60.8703 15.5163H60.8494C60.8494 15.5163 60.9225 16.1752 60.9225 16.5935V21.383H59.8891V14Z" fill="currentColor"/>
+<path d="M69.9281 15.966C71.5042 15.966 72.7777 17.1268 72.7777 18.7268C72.7777 20.3268 71.5042 21.5085 69.9281 21.5085C68.3519 21.5085 67.0784 20.3372 67.0784 18.7268C67.0784 17.1163 68.3519 15.966 69.9281 15.966ZM69.9281 20.6301C70.9301 20.6301 71.7443 19.8353 71.7443 18.7268C71.7443 17.6183 70.9301 16.8444 69.9281 16.8444C68.926 16.8444 68.1118 17.6287 68.1118 18.7268C68.1118 19.8248 68.9364 20.6301 69.9281 20.6301Z" fill="currentColor"/>
+<path d="M73.8528 16.0915H74.834V17.0118C74.834 17.2314 74.8131 17.4091 74.8131 17.4091H74.834C75.0741 16.6353 75.6899 16.0287 76.5041 16.0287C76.6398 16.0287 76.765 16.0497 76.765 16.0497V17.0536C76.765 17.0536 76.6293 17.0222 76.4728 17.0222C75.8256 17.0222 75.2306 17.4823 74.9905 18.2667C74.8966 18.5699 74.8653 18.8941 74.8653 19.2183V21.383H73.8528V16.0915Z" fill="currentColor"/>
+<path d="M77.2765 16.0915H78.3516L79.4476 19.8039C79.5311 20.0758 79.5729 20.3686 79.5833 20.3686H79.6042C79.6042 20.3686 79.6564 20.0758 79.7399 19.8039L80.8881 16.1019H81.8171L82.9549 19.8039C83.0384 20.0758 83.101 20.3686 83.101 20.3686H83.1219C83.1219 20.3686 83.1636 20.0758 83.2471 19.8039L84.3536 16.0915H85.4183L83.7169 21.383H82.6L81.504 17.9843C81.4205 17.7124 81.3578 17.4091 81.3578 17.4091H81.3369C81.3369 17.4091 81.2743 17.7124 81.1908 17.9843L80.1052 21.383H78.9779L77.2765 16.0915Z" fill="currentColor"/>
+<path d="M88.4375 15.966C89.9302 15.966 90.7235 17.0745 90.7235 18.4444C90.7235 18.5804 90.6922 18.8837 90.6922 18.8837H86.8405C86.8927 20.0444 87.7173 20.6301 88.6567 20.6301C89.5962 20.6301 90.2225 20.0131 90.2225 20.0131L90.64 20.7555C90.64 20.7555 89.8571 21.5085 88.5941 21.5085C86.9345 21.5085 85.7967 20.3059 85.7967 18.7372C85.7967 17.0536 86.9345 15.966 88.4375 15.966ZM89.6901 18.1203C89.6588 17.2104 89.0952 16.7712 88.4167 16.7712C87.6443 16.7712 87.018 17.2523 86.8718 18.1203H89.6901Z" fill="currentColor"/>
+<path d="M93.7949 22.7006C94.7135 22.7006 95.465 22.2928 95.465 21.2157V20.8287C95.465 20.6614 95.4755 20.4941 95.4755 20.4941H95.4546C95.1415 21.017 94.6509 21.3203 93.8889 21.3203C92.4171 21.3203 91.5298 20.1386 91.5298 18.6118C91.5298 17.085 92.3753 15.966 93.8367 15.966C95.1101 15.966 95.4964 16.7503 95.4964 16.7503H95.5172C95.5172 16.7503 95.5068 16.6771 95.5068 16.583V16.0915H96.4775V21.1634C96.4775 22.9098 95.1519 23.5791 93.8158 23.5791C93.1791 23.5791 92.5215 23.4013 92.01 23.1399L92.344 22.3451C92.344 22.3451 93.0016 22.7006 93.7949 22.7006ZM95.4859 18.6222C95.4859 17.2418 94.8179 16.8444 93.9933 16.8444C93.0747 16.8444 92.5528 17.5137 92.5528 18.5908C92.5528 19.668 93.1373 20.4418 94.0872 20.4418C94.8179 20.4418 95.4859 20.0026 95.4859 18.6222Z" fill="currentColor"/>
+<path d="M97.8972 14H98.9201V15.0353H97.8972V14ZM97.9076 16.0915H98.9201V21.383H97.9076V16.0915Z" fill="currentColor"/>
+<path d="M103.142 18.0784H103.372V17.9843C103.372 17.1163 102.881 16.8235 102.213 16.8235C101.399 16.8235 100.742 17.3359 100.742 17.3359L100.324 16.5935C100.324 16.5935 101.086 15.966 102.297 15.966C103.633 15.966 104.384 16.698 104.384 18.0366V21.383H103.445V20.881C103.445 20.6405 103.466 20.4627 103.466 20.4627H103.445C103.445 20.4627 103.017 21.5085 101.754 21.5085C100.846 21.5085 99.9587 20.9542 99.9587 19.898C99.9587 18.1516 102.255 18.0784 103.142 18.0784ZM101.973 20.6928C102.829 20.6928 103.382 19.7935 103.382 19.0091V18.8418H103.121C102.359 18.8418 100.982 18.8941 100.982 19.8457C100.982 20.2745 101.316 20.6928 101.973 20.6928Z" fill="currentColor"/>
+<path d="M105.773 16.0915H106.754V16.7921C106.754 17.0013 106.733 17.1791 106.733 17.1791H106.754C106.963 16.7189 107.589 15.966 108.737 15.966C109.979 15.966 110.553 16.6457 110.553 17.9948V21.383H109.541V18.2248C109.541 17.4823 109.384 16.8967 108.539 16.8967C107.693 16.8967 107.088 17.4301 106.869 18.1935C106.806 18.4026 106.785 18.6431 106.785 18.9046V21.383H105.773V16.0915Z" fill="currentColor"/>
+<path d="M59.8891 26.2876H62.4673C63.7095 26.2876 64.6072 26.9778 64.6072 28.1699C64.6072 28.8915 64.2523 29.4667 63.6886 29.7595V29.7804C64.461 30.0105 64.8994 30.7425 64.8994 31.5686C64.8994 32.9595 63.8243 33.6706 62.53 33.6706H59.8891V26.2876ZM62.4673 29.3935C63.1354 29.3935 63.5529 28.9229 63.5529 28.2745C63.5529 27.6262 63.1563 27.1869 62.4465 27.1869H60.9225V29.3935H62.4673ZM62.5822 32.7713C63.3755 32.7713 63.8452 32.2693 63.8452 31.5164C63.8452 30.7634 63.3441 30.251 62.5717 30.251H60.9225V32.7713H62.5822Z" fill="currentColor"/>
+<path d="M66.1337 28.3791H67.1462V31.5373C67.1462 32.2693 67.2924 32.8549 68.1379 32.8549C69.213 32.8549 69.8497 31.9033 69.8497 30.8575V28.3791H70.8622V33.6706H69.881V32.9699C69.881 32.7503 69.9019 32.583 69.9019 32.583H69.881C69.6618 33.1059 68.9729 33.7961 67.9395 33.7961C66.7496 33.7961 66.1337 33.1686 66.1337 31.7673V28.3791Z" fill="currentColor"/>
+<path d="M72.381 32.3007C72.381 32.3007 72.976 32.9177 73.8945 32.9177C74.3329 32.9177 74.7713 32.6876 74.7713 32.2588C74.7713 31.2863 72.0574 31.485 72.0574 29.7595C72.0574 28.7974 72.9133 28.2536 73.9676 28.2536C75.1262 28.2536 75.669 28.8392 75.669 28.8392L75.2619 29.6026C75.2619 29.6026 74.7922 29.132 73.9571 29.132C73.5187 29.132 73.0908 29.3203 73.0908 29.7804C73.0908 30.732 75.8047 30.5229 75.8047 32.2588C75.8047 33.1373 75.0532 33.7961 73.8945 33.7961C72.6002 33.7961 71.8904 33.0222 71.8904 33.0222L72.381 32.3007Z" fill="currentColor"/>
+<path d="M76.859 26.2876H77.882V27.3229H76.859V26.2876ZM76.8694 28.3791H77.882V33.6706H76.8694V28.3791Z" fill="currentColor"/>
+<path d="M79.3015 28.3791H80.2827V29.0797C80.2827 29.2889 80.2618 29.4667 80.2618 29.4667H80.2827C80.4915 29.0065 81.1178 28.2536 82.266 28.2536C83.5081 28.2536 84.0822 28.9333 84.0822 30.2824V33.6706H83.0697V30.5124C83.0697 29.7699 82.9131 29.1843 82.0676 29.1843C81.2221 29.1843 80.6167 29.7177 80.3975 30.4811C80.3349 30.6902 80.314 30.9307 80.314 31.1922V33.6706H79.3015V28.3791Z" fill="currentColor"/>
+<path d="M87.7669 28.2536C89.2596 28.2536 90.0529 29.3621 90.0529 30.732C90.0529 30.868 90.0216 31.1712 90.0216 31.1712H86.1699C86.222 32.332 87.0467 32.9177 87.9861 32.9177C88.9255 32.9177 89.5518 32.3007 89.5518 32.3007L89.9694 33.0431C89.9694 33.0431 89.1865 33.7961 87.9235 33.7961C86.2638 33.7961 85.126 32.5935 85.126 31.0248C85.126 29.3412 86.2638 28.2536 87.7669 28.2536ZM89.0195 30.4079C88.9882 29.498 88.4245 29.0588 87.746 29.0588C86.9736 29.0588 86.3473 29.5399 86.2012 30.4079H89.0195Z" fill="currentColor"/>
+<path d="M91.2324 32.3007C91.2324 32.3007 91.8273 32.9177 92.7459 32.9177C93.1843 32.9177 93.6227 32.6876 93.6227 32.2588C93.6227 31.2863 90.9088 31.485 90.9088 29.7595C90.9088 28.7974 91.7647 28.2536 92.819 28.2536C93.9776 28.2536 94.5204 28.8392 94.5204 28.8392L94.1133 29.6026C94.1133 29.6026 93.6436 29.132 92.8085 29.132C92.3701 29.132 91.9422 29.3203 91.9422 29.7804C91.9422 30.732 94.6561 30.5229 94.6561 32.2588C94.6561 33.1373 93.9045 33.7961 92.7459 33.7961C91.4516 33.7961 90.7418 33.0222 90.7418 33.0222L91.2324 32.3007Z" fill="currentColor"/>
+<path d="M95.7756 32.3007C95.7756 32.3007 96.3705 32.9177 97.2891 32.9177C97.7275 32.9177 98.1659 32.6876 98.1659 32.2588C98.1659 31.2863 95.452 31.485 95.452 29.7595C95.452 28.7974 96.3079 28.2536 97.3622 28.2536C98.5208 28.2536 99.0636 28.8392 99.0636 28.8392L98.6565 29.6026C98.6565 29.6026 98.1868 29.132 97.3517 29.132C96.9133 29.132 96.4854 29.3203 96.4854 29.7804C96.4854 30.732 99.1993 30.5229 99.1993 32.2588C99.1993 33.1373 98.4477 33.7961 97.2891 33.7961C95.9948 33.7961 95.285 33.0222 95.285 33.0222L95.7756 32.3007Z" fill="currentColor"/>
+<path d="M103.302 32.0392C103.302 32.0392 104.084 32.834 105.18 32.834C105.869 32.834 106.454 32.4471 106.454 31.7464C106.454 30.1464 102.884 30.4915 102.884 28.2222C102.884 27.0719 103.876 26.1621 105.264 26.1621C106.652 26.1621 107.352 26.9046 107.352 26.9046L106.882 27.7621C106.882 27.7621 106.203 27.1242 105.264 27.1242C104.481 27.1242 103.928 27.6157 103.928 28.2013C103.928 29.7281 107.498 29.3203 107.498 31.7151C107.498 32.8549 106.621 33.7961 105.16 33.7961C103.594 33.7961 102.717 32.8235 102.717 32.8235L103.302 32.0392Z" fill="currentColor"/>
+<path d="M111.12 28.2536C112.445 28.2536 113.103 29.0275 113.103 29.0275L112.623 29.7386C112.623 29.7386 112.059 29.132 111.161 29.132C110.097 29.132 109.324 29.9268 109.324 31.0144C109.324 32.102 110.097 32.9177 111.193 32.9177C112.174 32.9177 112.821 32.2065 112.821 32.2065L113.228 32.949C113.228 32.949 112.498 33.7961 111.12 33.7961C109.46 33.7961 108.291 32.6144 108.291 31.0248C108.291 29.4353 109.46 28.2536 111.12 28.2536Z" fill="currentColor"/>
+<path d="M114.183 26.2876H115.196V28.9961C115.196 29.2471 115.175 29.4353 115.175 29.4353H115.196C115.425 28.9229 116.094 28.2536 117.148 28.2536C118.39 28.2536 118.964 28.9333 118.964 30.2824V33.6706H117.952V30.5124C117.952 29.77 117.795 29.1843 116.949 29.1843C116.156 29.1843 115.499 29.7281 115.279 30.4915C115.217 30.7007 115.196 30.9412 115.196 31.1922V33.6706H114.183V26.2876Z" fill="currentColor"/>
+<path d="M122.85 28.2536C124.426 28.2536 125.699 29.4144 125.699 31.0144C125.699 32.6144 124.426 33.7961 122.85 33.7961C121.273 33.7961 120 32.6248 120 31.0144C120 29.4039 121.273 28.2536 122.85 28.2536ZM122.85 32.9177C123.852 32.9177 124.666 32.1229 124.666 31.0144C124.666 29.9059 123.852 29.132 122.85 29.132C121.848 29.132 121.033 29.9163 121.033 31.0144C121.033 32.1124 121.858 32.9177 122.85 32.9177Z" fill="currentColor"/>
+<path d="M129.274 28.2536C130.85 28.2536 132.124 29.4144 132.124 31.0144C132.124 32.6144 130.85 33.7961 129.274 33.7961C127.698 33.7961 126.425 32.6248 126.425 31.0144C126.425 29.4039 127.698 28.2536 129.274 28.2536ZM129.274 32.9177C130.276 32.9177 131.091 32.1229 131.091 31.0144C131.091 29.9059 130.276 29.132 129.274 29.132C128.272 29.132 127.458 29.9163 127.458 31.0144C127.458 32.1124 128.283 32.9177 129.274 32.9177Z" fill="currentColor"/>
+<path d="M133.168 26.2876H134.18V32.0497C134.18 32.6876 134.431 32.8026 134.744 32.8026C134.838 32.8026 134.921 32.7922 134.921 32.7922V33.6915C134.921 33.6915 134.765 33.7124 134.587 33.7124C134.013 33.7124 133.168 33.5556 133.168 32.2275V26.2876Z" fill="currentColor"/>
+<defs>
+<linearGradient id="paint0_linear_9485_462" x1="43.9187" y1="0" x2="18.2035" y2="-5.03381" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_9485_462" x1="45.7902" y1="4" x2="45.7787" y2="32.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<linearGradient id="paint2_linear_9485_462" x1="57.3937" y1="48" x2="31.6786" y2="42.9662" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint3_linear_9485_462" x1="5.86415" y1="52" x2="5.8526" y2="80.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<clipPath id="clip0_9485_462">
+<rect width="47.9113" height="48" fill="white"/>
+</clipPath>
+</defs>
+</svg></span></a>
+  <div class="topnav-groups">
+    <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
+      <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
+      <a class="topnav-link" href="part1_exercise2.html">Ex2</a>
+      <a class="topnav-link is-active" href="part1_exercise3.html">Ex3</a>
+    </div>
+    <div class="topnav-group topnav-p2"><span class="topnav-label">Part 2:</span>
+      <a class="topnav-link" href="part2_task1.html">T1</a>
+      <a class="topnav-link" href="part2_task2.html">T2</a>
+      <a class="topnav-link" href="part2_task3.html">T3</a>
+    </div>
+  </div>
+  <button class="topnav-toggle" aria-label="Toggle navigation" type="button">Menu</button>
+</nav>
+<div class="page-shell">
+  <header class="page-header">
+    <div class="page-breadcrumb">Part 1 · Exercise 3</div>
+    <h1>Exercise 3 — FINDBEST over the MATH benchmark</h1>
+    <div class="page-title-rule" aria-hidden="true"></div>
+    <p class="page-sub">Exercise 3: FINDBEST over the MATH benchmark</p>
+  </header>
+  <aside class="toc" aria-label="Table of contents">
+  <div class="toc-label">Contents</div>
+  <button class="toc-toggle" type="button" aria-controls="toc-list" aria-expanded="false">Contents</button>
+  <ul id="toc-list" class="toc-list">
+    <li class="toc-l2"><a href="#quick-orientation-to-the-math-table"><span class="toc-marker">01</span><span class="toc-text">Quick orientation to the MATH table</span></a>
+    </li>
+    <li class="toc-l2"><a href="#the-shape-of-3a-before-any-code"><span class="toc-marker">02</span><span class="toc-text">The shape of 3a, before any code</span></a>
+    </li>
+    <li class="toc-l2"><a href="#building-the-helper-first-findbest"><span class="toc-marker">03</span><span class="toc-text">Building the helper first — FINDBEST_</span></a>
+    </li>
+    <li class="toc-l2"><a href="#wrapping-with-findbest-makearray-over-quarters"><span class="toc-marker">04</span><span class="toc-text">Wrapping with FINDBEST — MAKEARRAY over quarters</span></a>
+    </li>
+    <li class="toc-l2"><a href="#3b-optional-arguments-with-isomitted"><span class="toc-marker">05</span><span class="toc-text">3b — Optional arguments with ISOMITTED</span></a>
+    </li>
+    <li class="toc-l2"><a href="#3c-plot-score-against-date-and-write-about-the-trend"><span class="toc-marker">06</span><span class="toc-text">3c — Plot score against date, and write about the trend</span></a>
+      <ul class="toc-sublist">
+        <li class="toc-l3"><a href="#click-path"><span class="toc-text">Click path</span></a></li>
+        <li class="toc-l3"><a href="#what-you-should-see"><span class="toc-text">What you should see</span></a></li>
+        <li class="toc-l3"><a href="#what-to-write"><span class="toc-text">What to write</span></a></li>
+      </ul>
+    </li>
+    <li class="toc-l2"><a href="#if-this-still-feels-shaky"><span class="toc-marker">07</span><span class="toc-text">If this still feels shaky</span></a>
+    </li>
+    <li class="toc-l2"><a href="#glossary"><span class="toc-marker toc-marker-gloss">—</span><span class="toc-text">Glossary</span></a>
+    </li>
+  </ul>
+</aside>
+  <main class="article-body">
+    <p>Exercise 3 moves to the second dataset, <code>MATH</code>, which holds benchmark results on <a class="glossary-link" href="#glossary-math" data-target="glossary-math">MATH</a> Level 5 — high-school competition math — for a long list of AI models with their release dates. The three subparts build toward the hardest <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> in the exam: 3a asks you to find the top-performing model in each quarter of a year (or range of years), returning a <a class="glossary-link" href="#glossary-dynamic-array" data-target="glossary-dynamic-array">dynamic array</a> of year / quarter / model / score; 3b asks you to make the year arguments optional so <code>FINDBEST()</code> with no arguments queries the whole dataset; 3c asks you to plot score against date and write a paragraph about what the pattern means. The LAMBDA in 3a is where most students slow down, because it has two things happening at once — a helper function that does the per-quarter work, and an outer function that sweeps over all the years and quarters and assembles the output. Build the helper first, confirm it works on one quarter, and only then wrap it in the outer loop.</p>
+<h2 id="quick-orientation-to-the-math-table">Quick orientation to the MATH table</h2>
+<p><code>MATH</code> has four columns: <code>id</code> (a string like <code>o1-mini-2024-09-12_high</code>), <code>model</code> (a friendlier name like <code>o1-mini</code>), <code>score</code> (a fraction between 0 and 1 — the proportion of problems the model solved correctly), and <code>date</code> (the model's release date as an Excel date value). One row per model release. The table spans from mid-2023 to mid-2025, with roughly 75 rows. Several models show up multiple times as they're rerun at different settings (Claude 3.7 Sonnet has entries for 16K, 32K, and 64K thinking budgets, for example) — each gets its own row with its own score.</p>
+<p>You'll use every column. <code>date</code> drives the quarter filtering, <code>score</code> is what you aggregate, <code>model</code> is what you report, and <code>id</code> is uninteresting for this exercise.</p>
+<p><a class="glossary-link" href="#glossary-excel-labs" data-target="glossary-excel-labs">Excel Labs</a>: same reminder as before — the LAMBDAs in 3a and 3b live in Excel Labs under the names <code>FINDBEST</code> and <code>FINDBEST_</code>. Lecture 4 introduces the tool; Lecture 6 introduces the LET-and-optional-arguments idiom that 3b relies on.</p>
+<h2 id="the-shape-of-3a-before-any-code">The shape of 3a, before any code</h2>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Try it first.</strong>Given a year and a quarter, how would you find the best-performing model? Write the steps in plain English before looking at the LAMBDA.</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>In words:
+1. Convert the year and quarter into a start date and an end date (so Q1 2024 becomes 2024-01-01 through 2024-03-31).
+2. Filter the <code>MATH</code> rows whose <code>date</code> falls in that window.
+3. If the filtered result is empty, return <code>"no data"</code> for both model and score.
+4. Otherwise, find the max <code>score</code> in the window and the <code>model</code> that achieved it.
+5. Return year, quarter, that model name, that score — four values side by side.</p>
+<p>That's the per-quarter work. 3a wraps this with "repeat for every quarter in the year range and stack the results, with a header row on top". The exam's wording deliberately hands you the clue in the <code>EOMONTH</code> hint — that's the function you'll use to compute the end-of-quarter date.</p></div></div><h2 id="building-the-helper-first-findbest">Building the helper first — <code>FINDBEST_</code></h2>
+<p>The canonical solution splits the work into two named LAMBDAs: <code>FINDBEST_</code> (with a trailing underscore) does the per-quarter work, and <code>FINDBEST</code> wraps it with a sweep over all quarters. The trailing-underscore convention is just a name — it says "this is a helper, normally called from inside <code>FINDBEST</code>, but you can still call it yourself for testing".</p>
+<div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">FINDBEST_ = LAMBDA(year, quarter,
+    LET(
+        start,   DATE(year, (quarter - 1) * 3 + 1, 1),
+        end,     EOMONTH(start, 2),
+
+        dates,   MATH[date],
+        models,  MATH[model],
+        scores,  MATH[score],
+
+        mask,            (dates &gt;= start) * (dates &lt;= end),
+        filtered_scores, IFERROR(FILTER(scores, mask), NA()),
+        filtered_models, IFERROR(FILTER(models, mask), NA()),
+
+        has_data,   AND(COUNTA(filtered_scores) &gt; 0,
+                        ISNUMBER(SUM(filtered_scores))),
+        max_score,  IF(has_data, MAX(filtered_scores), NA()),
+        best_model, IF(has_data,
+                       XLOOKUP(max_score, filtered_scores, filtered_models),
+                       &quot;no data&quot;),
+        score_out,  IF(has_data, max_score, &quot;no data&quot;),
+
+        HSTACK(year, quarter, best_model, score_out)
+    )
+)
+</code></pre></div>
+<p>That is the longest LAMBDA in the exam, so take it in pieces.</p>
+<p><strong>The date boundaries.</strong> <code>DATE(year, month, day)</code> constructs an Excel date value from three integers. <code>DATE(2024, 7, 15)</code> is the date value for July 15, 2024. The expression <code>(quarter - 1) * 3 + 1</code> turns a quarter number into the starting month: Q1 → 1, Q2 → 4, Q3 → 7, Q4 → 10. So <code>start</code> is the first day of the quarter.</p>
+<p><code>EOMONTH(start_date, months_to_add)</code> returns the last day of the month that is <code>months_to_add</code> months away from <code>start_date</code>. <code>EOMONTH("2024-01-01", 2)</code> is <code>"2024-03-31"</code> — start of January plus two months lands in March, and <code>EOMONTH</code> snaps to the last day of that month. So <code>end</code> is the last day of the third month of the quarter — i.e., the end of the quarter. This is exactly what the exam hint pointed you at.</p>
+<p><strong>The column aliases.</strong> <code>dates</code>, <code>models</code>, <code>scores</code> are just shorthand for the three MATH columns. <code>LET</code> lets you name them once and reuse them.</p>
+<p><strong>The filter.</strong> <code>mask</code> is a boolean column: <code>TRUE</code> on rows whose date falls between <code>start</code> and <code>end</code> inclusive. The <code>(a &gt;= b) * (c &lt;= d)</code> shape is the same boolean-multiplication-as-AND idiom you saw in Exercise 1 (1f, 1g). <code>filtered_scores</code> and <code>filtered_models</code> apply the mask to the <code>score</code> and <code>model</code> columns respectively, and wrap the result in <code>IFERROR(..., NA())</code> for the case where zero rows match — <code>FILTER</code> errors if nothing passes, and <code>IFERROR</code> swaps the error for an <code>#N/A</code> marker.</p>
+<p><strong>The has-data check.</strong> <code>COUNTA(range)</code> counts non-empty cells. <code>COUNTA(filtered_scores) &gt; 0</code> is <code>TRUE</code> if at least one score made it through. <code>ISNUMBER(SUM(filtered_scores))</code> catches the case where <code>filtered_scores</code> is <code>#N/A</code> (i.e., the filter returned an error and <code>IFERROR</code> replaced it): summing <code>#N/A</code> propagates the error, <code>ISNUMBER(#N/A)</code> is <code>FALSE</code>. Wrapping both in <code>AND</code> means you only treat the quarter as "has data" when there's at least one row and no error. This is belt-and-braces but catches every edge case.</p>
+<p><strong>The outputs.</strong> <code>max_score</code> is the best score in the quarter, or <code>#N/A</code> if no data. <code>best_model</code> is the model that achieved it, found with <code>XLOOKUP(lookup_value, lookup_array, return_array)</code> — look up <code>max_score</code> inside <code>filtered_scores</code>, return the matching entry of <code>filtered_models</code>. If there's no data, it becomes <code>"no data"</code>. <code>score_out</code> mirrors the score: real value if data, text <code>"no data"</code> otherwise. The reason <code>score_out</code> and <code>max_score</code> are separate is that <code>max_score</code> has to stay numeric for the <code>XLOOKUP</code>, while the reported score can be text.</p>
+<p><strong>The assembly.</strong> <code>HSTACK(year, quarter, best_model, score_out)</code> places the four outputs in a one-row, four-column block. That's what <code>FINDBEST_(year, quarter)</code> returns: a single row with four cells.</p>
+<p>Save this as <code>FINDBEST_</code> in Excel Labs, then test it: <code>=FINDBEST_(2024, 3)</code> should spill something like <code>2024 | 3 | o1 | 0.944</code> (or whatever the Q3 2024 winner is). If you get <code>"no data"</code> back in both slots, check the quarter mapping — Q3 2024 should map to July-September 2024.</p>
+<p>Common mistake: forgetting the <code>-1</code> in <code>(quarter - 1) * 3 + 1</code>. Writing <code>quarter * 3 + 1</code> maps Q1 to 4 (April), not January. Read your <code>DATE(year, ..., 1)</code> back and sanity-check the month.</p>
+<p>Second common mistake: <code>EOMONTH(start, 3)</code> instead of <code>EOMONTH(start, 2)</code>. Adding 3 months from January 1 lands in April — you'd include April in Q1, which is wrong. You want 2 months, so the quarter ends at the last day of March.</p>
+<p><strong>Lecture tie-in.</strong> <code>LET</code> with many locals is Lecture 6 (<code>06lecturefilled.xlsx</code> sheet "Local variables with LET"). For <code>FILTER</code> with a boolean mask, <code>03lecturefilled.xlsx</code> sheet "6 UNIQUE and FILTER" has the core examples, and <code>Solutions.FILTERBY</code> in <code>05exercises.xlsx</code> is a worked parallel. For <code>XLOOKUP</code>, see <code>03lecturefilled.xlsx</code> sheet "4 The LOOKUP functions". The <code>AND(COUNTA(...) &gt; 0, ISNUMBER(SUM(...)))</code> has-data pattern isn't explicitly taught in lecture, but it's a direct descendant of the missing-value guards in <code>Solutions.IFBLANK</code> (<code>04exercises.xlsx</code>) — same idea of checking emptiness before using a value.</p>
+<h2 id="wrapping-with-findbest-makearray-over-quarters">Wrapping with <code>FINDBEST</code> — <code>MAKEARRAY</code> over quarters</h2>
+<p>The outer function loops over every quarter in the year range and stacks the results, with a header row on top.</p>
+<div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">FINDBEST = LAMBDA(start_year, end_year,
+    LET(
+        years, YEAR(MATH[date]),
+        start, IF(ISOMITTED(start_year), MIN(years), start_year),
+        end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
+
+        n, (end_ - start + 1) * 4,
+
+        results, MAKEARRAY(n, 4,
+            LAMBDA(i, j,
+                LET(
+                    q_index, i - 1,
+                    year,    start + INT(q_index / 4),
+                    quarter, MOD(q_index, 4) + 1,
+                    best,    FINDBEST_(year, quarter),
+                    INDEX(best, j)
+                )
+            )
+        ),
+
+        VSTACK({&quot;Year&quot;,&quot;Quarter&quot;,&quot;Model&quot;,&quot;Score&quot;}, results)
+    )
+)
+</code></pre></div>
+<p>Walk it top to bottom.</p>
+<p><strong>Resolving the year range.</strong> <code>years</code> is the column of years from the <code>MATH</code> table's <code>date</code> column. <code>start</code> is <code>start_year</code> if supplied, otherwise the smallest year in the dataset. <code>end_</code> is <code>end_year</code> if supplied, otherwise the largest. <code>ISOMITTED(arg)</code> returns <code>TRUE</code> if the function was called without that argument — that's the whole 3b optionality trick, which we'll come back to below.</p>
+<p><code>start</code> and <code>end_</code> are renamed to avoid collision with Excel's internal keyword <code>end</code>. Some Excel versions let you use <code>end</code> as a local name; others don't. Picking <code>end_</code> with a trailing underscore sidesteps the question.</p>
+<p><strong>Counting total quarters.</strong> <code>n</code> is the total number of quarters in the range: years times four. <code>(2025 - 2023 + 1) * 4 = 12</code>, so for years 2023-2025 you build a 12-row output.</p>
+<p><strong>The core loop: <code>MAKEARRAY</code>.</strong> <code>MAKEARRAY(rows, cols, LAMBDA(i, j, body))</code> builds a dynamic array with <code>rows</code> rows and <code>cols</code> columns by calling the supplied two-argument LAMBDA for each <code>(i, j)</code> position. <code>i</code> is the row number (1 through <code>rows</code>), <code>j</code> is the column number (1 through <code>cols</code>). Here <code>rows = n</code> (total quarters) and <code>cols = 4</code> (year, quarter, model, score).</p>
+<p>For each <code>(i, j)</code>, the inner <code>LET</code> does:
+- <code>q_index = i - 1</code> — a zero-based quarter index, running <code>0, 1, 2, ..., n-1</code>.
+- <code>year = start + INT(q_index / 4)</code> — integer division of <code>q_index</code> by 4 gives the year offset from <code>start</code>. Quarters 0-3 are year 0, 4-7 are year 1, etc. <code>INT(x)</code> rounds toward negative infinity, which for non-negative integers is just truncation.
+- <code>quarter = MOD(q_index, 4) + 1</code> — modulo 4 plus 1 maps <code>0, 1, 2, 3</code> to <code>1, 2, 3, 4</code>. So the first quarter in each year is Q1, as expected.
+- <code>best = FINDBEST_(year, quarter)</code> — a one-row, four-column result from the helper.
+- <code>INDEX(best, j)</code> — pick out column <code>j</code> of the helper's result. <code>j = 1</code> is year, <code>j = 2</code> is quarter, <code>j = 3</code> is model, <code>j = 4</code> is score.</p>
+<p><code>MAKEARRAY</code> repeats that per-cell LAMBDA <code>n * 4</code> times and assembles an <code>n</code>-by-4 block. For <code>start = 2023</code>, <code>end_ = 2025</code>, you get 12 rows × 4 columns.</p>
+<p><strong>The header.</strong> <code>VSTACK(a, b, ...)</code> stacks arrays vertically; <code>VSTACK({"Year","Quarter","Model","Score"}, results)</code> puts a one-row header on top of the 12-row body. The <code>{...}</code> literal is Excel's array-literal syntax — comma separates columns inside a row, semicolon separates rows. A one-row four-column literal is exactly the header you want.</p>
+<p>Save this as <code>FINDBEST</code> in Excel Labs. Then <code>=FINDBEST(2023)</code> — a call with only the first argument — should spill a 13-row, 4-column block matching the exam's expected example output:</p>
+<div class="code-block"><button class="copy-btn" type="button">Copy</button><pre><code>Year  Quarter  Model     Score
+2023  1        no data   no data
+2023  2        GPT-4     0.230
+2023  3        Claude 2  0.117
+2023  4        GPT-4     0.400
+</code></pre></div>
+<p>Those exact numbers are in the exam spec, so they're your sanity check.</p>
+<p>One efficiency note people sometimes raise: every <code>MAKEARRAY</code> cell calls <code>FINDBEST_(year, quarter)</code> and picks out one column with <code>INDEX</code>. That means <code>FINDBEST_</code> gets called four times for the same <code>(year, quarter)</code> — once for each column — when it really only needs to be called once. That's the only technical wart in the canonical solution. Rewriting it to call the helper once per quarter would speed things up, but the exam doesn't penalise you for the direct-translation approach; it's a recognised trade-off.</p>
+<p>Common mistake: mixing up <code>INT(q_index / 4)</code> with <code>q_index / 4</code>. The latter gives you <code>0, 0.25, 0.5, 0.75, 1, 1.25, ...</code> — a float series — and <code>start + 0.25</code> isn't a valid year. <code>INT</code> (or <code>FLOOR</code>) is the floor toward zero you need.</p>
+<p>Second common mistake: hardcoding years in the <code>MAKEARRAY</code> loop, e.g., <code>year = 2023 + INT(q_index / 4)</code>. Do that and <code>FINDBEST(2024, 2025)</code> still starts in 2023. Keep the loop driven by <code>start</code>.</p>
+<p><strong>Lecture tie-in.</strong> <code>MAKEARRAY</code> is introduced in <code>05lecturefilled.xlsx</code> sheet "BYROW, BYCOL, and MAKEARRAY" — open that sheet and read the worked examples carefully. The LAMBDA-inside-LAMBDA nesting you see in <code>MAKEARRAY(n, 4, LAMBDA(i, j, ...))</code> is the defining shape of <code>MAKEARRAY</code>, so if the outer <code>LAMBDA(i, j, ...)</code> looks weird, that's the sheet to re-read. For <code>VSTACK</code> and array literals, same lecture's sheet "HSTACK and VSTACK". For the <code>LET</code> scaffolding, <code>06lecturefilled.xlsx</code> sheet "Local variables with LET" — open <code>Solutions.AVERAGEN</code> and <code>Solutions.FOOBAR</code> to see the same name-then-use rhythm.</p>
+<h2 id="3b-optional-arguments-with-isomitted">3b — Optional arguments with <code>ISOMITTED</code></h2>
+<p>3b is a small but important modification: <code>FINDBEST</code> should work with no arguments. <code>FINDBEST()</code> must return the same result as <code>FINDBEST(smallest_year_in_data, largest_year_in_data)</code>.</p>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>How would you make both arguments optional so that calling <code>FINDBEST()</code> still works? Write the idea in plain English before reading on.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden><p>The idea is: inside the function, check whether each argument was supplied; if not, fill it in with a default computed from the data. <code>ISOMITTED(arg)</code> is the function that lets you do this — it returns <code>TRUE</code> when the LAMBDA was called without <code>arg</code>, <code>FALSE</code> otherwise. You can only call <code>ISOMITTED</code> on arguments that were declared as optional in the <code>LAMBDA</code> header, which you mark by enclosing them in square brackets when defining the LAMBDA in Excel Labs. The canonical definition already has the optional markers — you can see them in the <code>_xlop.start_year, _xlop.end_year</code> prefixes inside the workbook definition.</p>
+<p>The three lines doing the defaulting (already in the version above):</p>
+<div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">years, YEAR(MATH[date]),
+start, IF(ISOMITTED(start_year), MIN(years), start_year),
+end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
+</code></pre></div></div></div>
+<p><code>years</code> is the column of years across the whole dataset. <code>MIN(years)</code> is the earliest year present; <code>MAX(years)</code> is the latest. If the caller supplied <code>start_year</code>, use it; if not, fall back to <code>MIN(years)</code>. Same for <code>end_year</code> with <code>MAX</code>.</p>
+<p>The exam is explicit that you must not hardcode 2023 and 2025 here — that would break if the dataset gets updated. Querying the data for its own extremes is the right shape.</p>
+<p>Save this as your updated <code>FINDBEST</code>. Now <code>=FINDBEST()</code> with no arguments spills the whole dataset's worth of quarters, and the sanity check is that <code>=FINDBEST()</code> equals <code>=FINDBEST(2023, 2025)</code> (the exam says so directly).</p>
+<p>Common mistake: forgetting the square brackets around the optional arguments. If the LAMBDA header says <code>LAMBDA(start_year, end_year, ...)</code> (no brackets), <code>ISOMITTED</code> raises an error when either argument is missing. The definition must be <code>LAMBDA([start_year], [end_year], ...)</code> — bracketed names are optional.</p>
+<p>Second common mistake: defaulting only one argument. <code>FINDBEST(2024)</code> should give 2024 to 2025 (the default end year), and <code>FINDBEST()</code> should give 2023 to 2025. You need both <code>IF(ISOMITTED(...), ...)</code> lines.</p>
+<p><strong>Lecture tie-in.</strong> <code>ISOMITTED</code> and optional LAMBDA arguments are introduced in <code>06lecturefilled.xlsx</code> sheet "Optional arguments" — that is the direct lecture for this subpart. Read <code>Solutions.FOOBAR</code> in that file's Excel Labs; it's a three-argument LAMBDA with two optional arguments defaulted via exactly this pattern. For a more substantial worked parallel, read <code>Solutions.AVERAGEN</code> in the same file — it takes an optional <code>largest</code> flag with a <code>TRUE</code> default, same idiom.</p>
+<h2 id="3c-plot-score-against-date-and-write-about-the-trend">3c — Plot score against date, and write about the trend</h2>
+<p>3c: <a class="glossary-link" href="#glossary-scatter-plot" data-target="glossary-scatter-plot">scatter plot</a> with <code>date</code> on the x-axis and <code>score</code> on the y-axis, then a short paragraph on the pattern and its implications.</p>
+<h3 id="click-path">Click path</h3>
+<ol>
+<li>Select the two columns you want. In the <code>MATH</code> table, click the <code>date</code> header, then Ctrl+click the <code>score</code> header. (The solution note observes that because <code>date</code> comes after <code>score</code> in the raw table, you might need to rearrange into a scratch two-column block with <code>date</code> first if Excel picks them up in the wrong order. A quick fix is to copy them side by side into free cells with <code>date</code> in the left column and <code>score</code> in the right, then select that block.)</li>
+<li>Insert tab → Scatter → first option (dots, no lines).</li>
+<li>The y-axis is a fraction from 0 to 1 — no log scale needed here, and in fact log scale would be actively wrong for a fraction. Leave the y-axis linear.</li>
+<li>The x-axis should be a <a class="glossary-link" href="#glossary-date-axis" data-target="glossary-date-axis">date axis</a>, so Excel lays out points by true date position (not just categorically). Right-click the x-axis → Format Axis → Axis type → Date axis (this is usually selected automatically for scatter plots, but worth confirming).</li>
+<li>Title and label the axes — "MATH Level 5 score by release date", <code>Date</code>, <code>Score</code>.</li>
+</ol>
+<h3 id="what-you-should-see">What you should see</h3>
+<p>A roughly linear climb on the <em>linear</em> axis from mid-2023 (scores around 0.05 to 0.20) to early 2025 (scores clustering 0.85 to 0.95), with a lot of spread — different-size models have very different scores — but a clear upward trend. Towards the end, the top scores crowd against the ceiling at 1.0 because the benchmark has a maximum possible score.</p>
+<h3 id="what-to-write">What to write</h3>
+<p>Four ideas to weave into the paragraph. The solution workbook has a model version you can paraphrase.</p>
+<ol>
+<li><strong>The trend is roughly linear over two years on the score axis.</strong> Scores grow from near-zero to near-1 over about eighteen months, and the rate looks roughly constant on the linear axis.</li>
+<li><strong>Current top scores are essentially 1.0.</strong> Models like <code>o3-mini-2025-01-31_high</code> score 0.96, <code>Gemini 2.5 Pro</code> 0.956, <code>o1_high</code> 0.947. The benchmark ceiling is being hit.</li>
+<li><strong>If the trend continued past 1, we'd expect future models to do well on harder math too</strong> — but since the benchmark caps at 1.0, we can't actually measure further progress with this benchmark.</li>
+<li><strong>This is benchmark saturation.</strong> When a test maxes out, a harder test is needed to differentiate the next generation of models. The MATH benchmark is already being replaced in industry by successors like Putnam-2024 and FrontierMath.</li>
+</ol>
+<p>The canonical wording from the solution: <em>"The scores have increased roughly linearly since the first model was released. Currently, the top score is approximately 1. This suggests that modern AI models are very strong at solving high school-level math problems. If the trend continues beyond a score of 1, we would expect future models to perform well on more advanced mathematics too. However, since this benchmark measures scores on a scale from 0 to 1, we cannot observe performance beyond that upper limit. This limitation is known as benchmark saturation."</em> Paraphrase rather than copy.</p>
+<p>The "which AI company is most focused on mathematical capabilities" question from 3a (asked alongside the <code>FINDBEST(2023)</code> output) — the expected answer is <strong>OpenAI</strong>, which dominates the quarterly best-in-quarter leaderboard with <code>GPT-4</code>, <code>o1-preview</code>, <code>o1</code>, <code>o1-mini</code>, <code>o3-mini</code>. Anthropic, Google, and DeepSeek have strong entries too but don't top as many quarters.</p>
+<p>Common mistake: using a line chart instead of scatter. Line chart connects dots, which looks like you're claiming a continuous function of time — not what you want when models are discrete releases. Scatter is correct.</p>
+<p>Second common mistake: putting log scale on the score axis. Scores are fractions; <code>log(0.1)</code> is <code>-1</code>, <code>log(0.9)</code> is <code>-0.046</code>. A log axis squeezes high scores together and stretches low scores. On a linear axis 0 to 1 the visual spacing matches the quantities, which is what you want.</p>
+<p><strong>Lecture tie-in.</strong> Chart construction is <code>03lecturefilled.xlsx</code>. For a clean slide on scatter plots with date x-axes, <code>02Charts.pdf</code> is the direct reference. The benchmark-saturation commentary isn't formally taught but it's the reason Jonas and Adam keep emphasising that the <em>choice</em> of benchmark matters — an observation worth making explicit in your write-up.</p>
+<h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
+<p>If the <code>MAKEARRAY</code> construction is the block, stop working on <code>FINDBEST</code> and open <code>05lecturefilled.xlsx</code> sheet "BYROW, BYCOL, and MAKEARRAY". Work through each worked example in Excel Labs until you can predict what a 3x3 <code>MAKEARRAY(3, 3, LAMBDA(i, j, i * 10 + j))</code> call produces. Then come back to <code>FINDBEST</code>.</p>
+<p>If the helper function <code>FINDBEST_</code> errors on a particular quarter, test it in isolation: <code>=FINDBEST_(2023, 1)</code> should return <code>{2023, 1, "no data", "no data"}</code> (there's no 2023 Q1 data in <code>MATH</code>). <code>=FINDBEST_(2024, 3)</code> should give a real model and real score. Getting each quarter right in isolation is much easier than debugging it through the <code>MAKEARRAY</code> wrapper.</p>
+<p>If <code>ISOMITTED</code> is the block, open <code>06lecturefilled.xlsx</code> sheet "Optional arguments" and read <code>Solutions.FOOBAR</code> and <code>Solutions.AVERAGEN</code>. Both are two- or three-argument LAMBDAs that fill in defaults for missing arguments exactly the way 3b wants.</p>
+    <section class="glossary-section" id="glossary">
+<h2 id="glossary-heading">Glossary</h2>
+<dl class="glossary-list">
+<dt id="glossary-array-literal"><strong>Array literal</strong></dt><dd><p>A constant array written inline, e.g., <code>{"Year","Quarter","Model","Score"}</code>. Commas separate columns inside a row; semicolons separate rows. Used in <code>VSTACK</code> inside <code>FINDBEST</code>.</p></dd>
+<dt id="glossary-countarange"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/counta-function" target="_blank" rel="noopener" title="View COUNTA on ExcelJet">COUNTA</a>(range)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Counts non-empty cells in <code>range</code>. Used in the <code>has_data</code> check to confirm the quarter produced at least one matching row.</p></dd>
+<dt id="glossary-dateyear-month-day"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/date-function" target="_blank" rel="noopener" title="View DATE on ExcelJet">DATE</a>(year, month, day)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Constructs an Excel date value from three integers. Used to build the start-of-quarter date in <code>FINDBEST_</code>.</p></dd>
+<dt id="glossary-date-axis"><strong>Date axis</strong></dt><dd><p>A chart axis type that lays out values by real date position, not by ordered position in the data. The right setting for scatter plots with date x-axes.</p></dd>
+<dt id="glossary-dynamic-array"><strong>Dynamic array</strong></dt><dd><p>A formula result that spills into a rectangular block of cells. <code>FINDBEST</code> returns a dynamic array; the top-left cell holds the formula, the rest of the block is filled in by Excel.</p></dd>
+<dt id="glossary-eomonthdate-months"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/eomonth-function" target="_blank" rel="noopener" title="View EOMONTH on ExcelJet">EOMONTH</a>(date, months)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns the last day of the month that is <code>months</code> months after <code>date</code>. <code>EOMONTH("2024-01-01", 2)</code> is <code>"2024-03-31"</code>. Used to compute the end-of-quarter date.</p></dd>
+<dt id="glossary-excel-labs"><strong>Excel Labs</strong></dt><dd><p>The Microsoft Research add-in that provides the Advanced Formula Environment — the pane where LAMBDAs are saved by name. Covered in Lecture 4.</p></dd>
+<dt id="glossary-filterarray-keep-condition"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/filter-function" target="_blank" rel="noopener" title="View FILTER on ExcelJet">FILTER</a>(array, keep_condition)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns rows of <code>array</code> where <code>keep_condition</code> is <code>TRUE</code>. Used to restrict <code>MATH</code> to one quarter's rows.</p></dd>
+<dt id="glossary-hstacka-b"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/hstack-function" target="_blank" rel="noopener" title="View HSTACK on ExcelJet">HSTACK</a>(a, b, ...)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Stacks arrays horizontally. Used at the end of <code>FINDBEST_</code> to combine year, quarter, model, score into one row.</p></dd>
+<dt id="glossary-iferrorvalue-alt"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/iferror-function" target="_blank" rel="noopener" title="View IFERROR on ExcelJet">IFERROR</a>(value, alt)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>If <code>value</code> is any error, return <code>alt</code> instead. Used to handle quarters with no matching data by substituting <code>NA()</code>.</p></dd>
+<dt id="glossary-indexarray-row-column"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/index-function" target="_blank" rel="noopener" title="View INDEX on ExcelJet">INDEX</a>(array, row, column)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns the single cell at <code>(row, column)</code> of <code>array</code>. Used in <code>FINDBEST</code> to pull one column from the helper's four-column result.</p></dd>
+<dt id="glossary-intx"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/int-function" target="_blank" rel="noopener" title="View INT on ExcelJet">INT</a>(x)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Rounds <code>x</code> toward negative infinity. For non-negative values it's the same as truncation. Used in <code>FINDBEST</code> to convert a zero-based quarter index into a year offset.</p></dd>
+<dt id="glossary-isomittedarg"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/isomitted-function" target="_blank" rel="noopener" title="View ISOMITTED on ExcelJet">ISOMITTED</a>(arg)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns <code>TRUE</code> if the LAMBDA was called without <code>arg</code>. Only valid on arguments declared optional with <code>[brackets]</code> in the LAMBDA header. The central trick of 3b.</p></dd>
+<dt id="glossary-lambda"><strong><a class="exceljet-link" href="https://exceljet.net/functions/lambda-function" target="_blank" rel="noopener" title="View LAMBDA on ExcelJet">LAMBDA</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>A reusable function, defined with <code>LAMBDA(args, body)</code> and saved by name in Excel Labs. Optional arguments are written <code>LAMBDA([arg1], [arg2], ...)</code>.</p></dd>
+<dt id="glossary-letname1-val1-final"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/let-function" target="_blank" rel="noopener" title="View LET on ExcelJet">LET</a>(name1, val1, ..., final)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Binds local names to values. Doesn't change results; makes long formulas readable. <code>FINDBEST</code> uses over a dozen locals.</p></dd>
+<dt id="glossary-makearrayrows-cols-lambdai-j-body"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/makearray-function" target="_blank" rel="noopener" title="View MAKEARRAY on ExcelJet">MAKEARRAY</a>(rows, cols, <a class="exceljet-link" href="https://exceljet.net/functions/lambda-function" target="_blank" rel="noopener" title="View LAMBDA on ExcelJet">LAMBDA</a>(i, j, body))</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Builds a <code>rows</code>-by-<code>cols</code> array by calling the two-argument LAMBDA once per cell. <code>i</code> is the row index (1-based), <code>j</code> is the column index. The sweep-and-assemble primitive behind <code>FINDBEST</code>.</p></dd>
+<dt id="glossary-math"><strong>MATH</strong></dt><dd><p>The Excel table on the <code>MATH</code> sheet. Columns: <code>id</code>, <code>model</code>, <code>score</code>, <code>date</code>. One row per model release with its MATH Level 5 benchmark score.</p></dd>
+<dt id="glossary-maxrange-minrange"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/max-function" target="_blank" rel="noopener" title="View MAX on ExcelJet">MAX</a>(range)</code> / <code><a class="exceljet-link" href="https://exceljet.net/functions/min-function" target="_blank" rel="noopener" title="View MIN on ExcelJet">MIN</a>(range)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Largest / smallest numeric value. Used in <code>FINDBEST</code> to compute default year bounds and in <code>FINDBEST_</code> to find the best score.</p></dd>
+<dt id="glossary-modn-divisor"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/mod-function" target="_blank" rel="noopener" title="View MOD on ExcelJet">MOD</a>(n, divisor)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Remainder of <code>n / divisor</code>. <code>MOD(5, 4)</code> is <code>1</code>. Used in <code>FINDBEST</code> to convert a zero-based index into a quarter number 1-4.</p></dd>
+<dt id="glossary-na"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/na-function" target="_blank" rel="noopener" title="View NA on ExcelJet">NA</a>()</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Produces the <code>#N/A</code> error deliberately. Used to mark "no data" in <code>FINDBEST_</code>.</p></dd>
+<dt id="glossary-scatter-plot"><strong>Scatter plot</strong></dt><dd><p>A chart type where each point sits at its real <code>(x, y)</code> coordinate with no connecting line. Used in 3c with <code>date</code> on x and <code>score</code> on y.</p></dd>
+<dt id="glossary-sumrange"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/sum-function" target="_blank" rel="noopener" title="View SUM on ExcelJet">SUM</a>(range)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Adds numeric values in <code>range</code>. Used inside the <code>has_data</code> check to detect whether the filtered scores are real numbers (summing <code>#N/A</code> gives <code>#N/A</code>).</p></dd>
+<dt id="glossary-trailing-underscore-helper"><strong>Trailing-underscore helper</strong></dt><dd><p>A naming convention: <code>FINDBEST_</code> is the helper called by <code>FINDBEST</code>. Nothing special to Excel, just a hint to readers.</p></dd>
+<dt id="glossary-vstacka-b"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/vstack-function" target="_blank" rel="noopener" title="View VSTACK on ExcelJet">VSTACK</a>(a, b, ...)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Stacks arrays vertically. Used at the end of <code>FINDBEST</code> to place the header row above the body.</p></dd>
+<dt id="glossary-xlookuplookup-in-array-return-array"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/xlookup-function" target="_blank" rel="noopener" title="View XLOOKUP on ExcelJet">XLOOKUP</a>(lookup, in_array, return_array)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Finds <code>lookup</code> in <code>in_array</code> and returns the corresponding entry from <code>return_array</code>. Used in <code>FINDBEST_</code> to map the max score back to its model.</p></dd>
+<dt id="glossary-yeardate"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/year-function" target="_blank" rel="noopener" title="View YEAR on ExcelJet">YEAR</a>(date)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns the four-digit year of an Excel date. Applied to the full <code>MATH[date]</code> column in <code>FINDBEST</code> to compute the dataset's year range for defaults.</p></dd>
+</dl></section>
+  </main>
+</div>
+<script>
+(function () {
+  const bar = document.querySelector('.progress-bar');
+  const indicator = document.querySelector('.progress-indicator');
+  function onScroll() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (bar) bar.style.width = p + '%';
+    if (indicator) indicator.textContent = Math.round(p) + '%';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  onScroll();
+
+  document.querySelectorAll('.reveal-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const id = btn.getAttribute('data-target');
+      const content = document.getElementById(id);
+      if (!content) return;
+      content.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.style.display = 'none';
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const container = btn.closest('.code-block');
+      if (!container) return;
+      const pre = container.querySelector('pre');
+      if (!pre) return;
+      const text = pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      const orig = btn.textContent;
+      btn.textContent = 'Copied';
+      btn.classList.add('is-copied');
+      setTimeout(function () {
+        btn.textContent = orig;
+        btn.classList.remove('is-copied');
+      }, 1500);
+    });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const idToLink = {};
+  tocLinks.forEach(function (a) {
+    const href = a.getAttribute('href');
+    if (href && href.charAt(0) === '#') idToLink[href.slice(1)] = a;
+  });
+  const headings = document.querySelectorAll('.article-body > h2, .article-body h3, .glossary-section h2');
+  if ('IntersectionObserver' in window && headings.length) {
+    let active = null;
+    const visible = new Set();
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) visible.add(e.target.id);
+        else visible.delete(e.target.id);
+      });
+      let earliest = null;
+      headings.forEach(function (h) {
+        if (visible.has(h.id) && !earliest) earliest = h.id;
+      });
+      if (!earliest && headings.length) {
+        let nearest = null;
+        headings.forEach(function (h) {
+          const top = h.getBoundingClientRect().top;
+          if (top < 120) nearest = h.id;
+        });
+        earliest = nearest;
+      }
+      if (earliest && earliest !== active) {
+        if (active && idToLink[active]) idToLink[active].classList.remove('is-active');
+        active = earliest;
+        if (idToLink[active]) idToLink[active].classList.add('is-active');
+      }
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    headings.forEach(function (h) { obs.observe(h); });
+  }
+
+  const tocToggle = document.querySelector('.toc-toggle');
+  const tocList = document.querySelector('.toc-list');
+  if (tocToggle && tocList) {
+    tocToggle.addEventListener('click', function () {
+      const open = tocList.classList.toggle('is-open');
+      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  const navToggle = document.querySelector('.topnav-toggle');
+  const navGroups = document.querySelector('.topnav-groups');
+  if (navToggle && navGroups) {
+    navToggle.addEventListener('click', function () {
+      navGroups.classList.toggle('is-open');
+    });
+  }
+
+  function flash(el) {
+    if (!el) return;
+    el.classList.add('is-flashing');
+    const dd = el.nextElementSibling;
+    if (dd && dd.tagName === 'DD') dd.classList.add('is-flashing');
+    setTimeout(function () {
+      el.classList.remove('is-flashing');
+      if (dd && dd.tagName === 'DD') dd.classList.remove('is-flashing');
+    }, 1500);
+  }
+  document.querySelectorAll('.glossary-link').forEach(function (a) {
+    a.addEventListener('click', function () {
+      const id = a.getAttribute('data-target');
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        setTimeout(function () { flash(target); }, 300);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

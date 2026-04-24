@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task 2 — Monthly averages, two different ways — ELE3915</title>
+<style>
+:root {
+  --accent-current: #5fcc8f;
+}
+
+:root {
+  --navy: #1a2332;
+  --teal-base: #2d8b8b;
+  --teal-brighter: #43c2c2;
+  --teal-darker: #5fcc8f;
+  --seafoam: #a8dadc;
+  --cream: #f1faee;
+  --paper: #fbfdfa;
+  --text: #1a2332;
+  --text-muted: #556070;
+  --border: #d7e0e0;
+  --code-bg: #eef3f3;
+  --code-border: #cbd9d9;
+  --header-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --body-font: 'DejaVu Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono-font: 'DejaVu Sans Mono', Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 1, "kern" 1;
+  font-variant-numeric: lining-nums proportional-nums;
+}
+
+/* ---------- Progress bar ---------- */
+.progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #d4dcdc;
+  z-index: 100;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-current);
+  transition: width 0.08s linear;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-current) 55%, transparent);
+}
+
+.progress-indicator {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 60;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  background: color-mix(in srgb, var(--navy) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-current) 55%, transparent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  min-width: 44px;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: opacity 0.2s ease;
+}
+
+@media (max-width: 820px) {
+  .progress-indicator {
+    top: 11px;
+    right: 10px;
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
+
+/* ---------- Top navigation ---------- */
+.topnav {
+  position: sticky;
+  top: 6px;
+  z-index: 50;
+  background: var(--navy);
+  color: var(--cream);
+  padding: 10px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+.topnav-home {
+  color: var(--cream);
+  font-weight: 700;
+  font-family: var(--header-font);
+  text-decoration: none;
+  padding: 4px 12px 4px 4px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border-left: 3px solid var(--seafoam);
+  margin-right: 6px;
+}
+
+.topnav-home:hover { color: var(--seafoam); }
+
+.topnav-logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--cream);        /* drives currentColor on the "BI ..." text */
+  line-height: 0;             /* trim baseline whitespace around the SVG */
+  margin-left: 8px;
+  transition: opacity 0.15s ease;
+}
+
+.topnav-logo svg {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+
+.topnav-home:hover .topnav-logo { opacity: 0.88; }
+
+@media (max-width: 820px) {
+  .topnav-logo svg { height: 26px; }
+}
+
+.topnav-groups {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.topnav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topnav-label {
+  color: #8ea0b8;
+  font-size: 14px;
+  font-family: var(--header-font);
+  letter-spacing: 0.02em;
+}
+
+.topnav-link {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 10px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.topnav-p1 .topnav-link { color: var(--teal-brighter); }
+.topnav-p2 .topnav-link { color: var(--teal-darker); }
+
+.topnav-link:hover {
+  text-decoration: underline;
+}
+
+.topnav-link.is-active {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  font-weight: 700;
+}
+
+.topnav-toggle {
+  display: none;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid #3a4a62;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-size: 14px;
+  margin-left: auto;
+}
+
+@media (max-width: 820px) {
+  .topnav { flex-wrap: wrap; gap: 8px; }
+  .topnav-toggle { display: inline-flex; }
+  .topnav-groups { display: none; width: 100%; flex-direction: column; align-items: flex-start; gap: 12px; padding: 8px 0 2px; }
+  .topnav-groups.is-open { display: flex; }
+  .topnav-group { gap: 6px; flex-wrap: wrap; }
+}
+
+/* ---------- Page layout ---------- */
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 28px 96px;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 40px;
+}
+
+@media (max-width: 1024px) {
+  .page-shell {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.page-header {
+  grid-column: 1 / -1;
+  margin-bottom: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-breadcrumb {
+  font-family: var(--header-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-family: var(--header-font);
+  font-weight: 700;
+  font-size: 2.15rem;
+  margin: 0 0 10px 0;
+  color: var(--navy);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.page-title-rule {
+  width: 44px;
+  height: 3px;
+  background: var(--accent-current);
+  margin: 0 0 14px 0;
+}
+
+.page-header .page-sub {
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ---------- Table of contents ---------- */
+.toc {
+  position: sticky;
+  top: 68px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+  padding: 18px 14px 24px 16px;
+  font-size: 14px;
+  background: var(--navy);
+  color: #b8c6d4;
+  border-left: 3px solid var(--accent-current);
+  box-shadow: 0 4px 18px rgba(26, 35, 50, 0.12);
+}
+
+.toc-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-current);
+  padding: 0 0 12px 2px;
+  border-bottom: 1px solid #2b3a50;
+  margin-bottom: 8px;
+}
+
+.toc-toggle {
+  display: none;
+  background: var(--navy);
+  border: 1px solid #2b3a50;
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font-family: var(--header-font);
+  font-weight: 600;
+  color: var(--cream);
+  width: 100%;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-list li { margin: 0; }
+
+.toc-list a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 6px 7px 4px;
+  color: #b8c6d4;
+  text-decoration: none;
+  line-height: 1.3;
+  position: relative;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.toc-marker {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: #6e829a;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 20px;
+}
+
+.toc-marker-gloss {
+  font-family: var(--header-font);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: #8ea0b8;
+}
+
+.toc-text {
+  flex: 1;
+}
+
+.toc-list a:hover {
+  color: var(--cream);
+  background: color-mix(in srgb, var(--accent-current) 14%, transparent);
+}
+
+.toc-list a:hover .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list .toc-l3 a {
+  padding-left: 34px;
+  font-size: 13px;
+  color: #8696a8;
+}
+
+.toc-list .toc-l3 a:hover { color: var(--cream); }
+
+.toc-list a.is-active {
+  color: var(--accent-current);
+  background: color-mix(in srgb, var(--accent-current) 22%, transparent);
+  font-weight: 600;
+}
+
+.toc-list a.is-active .toc-marker {
+  color: var(--accent-current);
+}
+
+.toc-list a.is-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-current);
+  box-shadow: 0 0 6px var(--accent-current);
+}
+
+.toc-sublist { list-style: none; margin: 2px 0 2px; padding: 0; }
+
+/* Slim scrollbar for the dark TOC */
+.toc::-webkit-scrollbar { width: 6px; }
+.toc::-webkit-scrollbar-track { background: transparent; }
+.toc::-webkit-scrollbar-thumb {
+  background: #2b3a50;
+  border-radius: 3px;
+}
+.toc::-webkit-scrollbar-thumb:hover { background: #3a4a62; }
+
+@media (max-width: 1024px) {
+  .toc {
+    position: static;
+    max-height: none;
+    padding: 14px 16px 16px;
+    margin-bottom: 24px;
+    border-left: 3px solid var(--accent-current);
+  }
+  .toc-label { display: none; }
+  .toc-toggle { display: block; }
+  .toc-list { display: none; }
+  .toc-list.is-open { display: block; }
+}
+
+/* ---------- Article content ---------- */
+.article-body {
+  max-width: 72ch;
+  counter-reset: section;
+}
+
+.article-body > h2 {
+  counter-increment: section;
+  font-family: var(--header-font);
+  font-size: 1.6rem;
+  margin-top: 3rem;
+  margin-bottom: 0.55rem;
+  padding-top: 1.9rem;
+  line-height: 1.2;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  letter-spacing: -0.005em;
+}
+
+.article-body > h2::before {
+  content: counter(section, decimal-leading-zero);
+  font-family: var(--mono-font);
+  font-size: 0.72em;
+  font-weight: 600;
+  color: var(--accent-current);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15em;
+  flex-shrink: 0;
+}
+
+.article-body > h2:first-of-type { border-top: none; padding-top: 0.2rem; }
+
+/* Glossary heading — no counter */
+.article-body .glossary-section > h2 {
+  font-family: var(--header-font);
+  font-size: 1.55rem;
+  margin-top: 3rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1.9rem;
+  line-height: 1.25;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+
+.article-body h3 {
+  font-family: var(--header-font);
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+  color: var(--text);
+  position: relative;
+  padding-left: 18px;
+}
+
+.article-body h3::before {
+  content: "‣";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: color-mix(in srgb, var(--accent-current) 60%, transparent);
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.article-body h4 {
+  font-family: var(--header-font);
+  font-size: 1.04rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  color: var(--text);
+}
+
+.article-body p {
+  margin: 0.9rem 0;
+}
+
+/* (Drop cap removed per user feedback — felt distracting.) */
+
+.article-body ul,
+.article-body ol {
+  margin: 0.8rem 0;
+  padding-left: 1.6rem;
+}
+
+.article-body li {
+  margin: 0.3rem 0;
+}
+
+.article-body code {
+  font-family: var(--mono-font);
+  font-size: 0.92em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.article-body strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.article-body a {
+  color: var(--accent-current);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.article-body table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.article-body th,
+.article-body td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.article-body th {
+  background: #eaf0f0;
+  font-family: var(--header-font);
+  font-weight: 700;
+}
+
+/* ---------- Code blocks ---------- */
+.code-block {
+  position: relative;
+  margin: 1.3rem 0 1.4rem;
+  border: 1px solid var(--code-border);
+  border-left: 3px solid var(--accent-current);
+  background: #0f1a24;
+  color: #e2e9ea;
+  padding-top: 22px;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 4px 16px 14px;
+  overflow-x: auto;
+  font-family: var(--mono-font);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.code-block code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.code-lang {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--accent-current);
+  color: var(--navy);
+  font-family: var(--header-font);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 3px 10px 4px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #2a3f4d;
+  color: #e2e9ea;
+  border: 1px solid #3a5362;
+  padding: 4px 10px;
+  font-family: var(--header-font);
+  font-size: 12px;
+  cursor: pointer;
+  min-height: 30px;
+  letter-spacing: 0.03em;
+  transition: background-color 0.15s ease;
+}
+
+.copy-btn:hover { background: #355060; }
+.copy-btn.is-copied { background: var(--accent-current); color: var(--navy); border-color: var(--accent-current); }
+
+/* ---------- Reveal blocks (think-before prompts) ---------- */
+.reveal-block {
+  position: relative;
+  margin: 1.8rem 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent-current) 30%, transparent);
+  border-left: 4px solid var(--accent-current);
+  background: #f4f9f9;
+}
+
+.reveal-block::before {
+  content: "?";
+  position: absolute;
+  top: -2px;
+  left: 14px;
+  font-family: var(--header-font);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent-current);
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.reveal-question {
+  padding: 16px 18px 12px 44px;
+  font-size: 1.02rem;
+}
+
+.reveal-question p {
+  margin: 0;
+}
+
+.reveal-btn {
+  margin: 4px 18px 16px 44px;
+  background: var(--accent-current);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  font-family: var(--header-font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: filter 0.15s ease;
+}
+
+.reveal-btn:hover {
+  filter: brightness(0.92);
+}
+
+.reveal-content {
+  padding: 2px 18px 14px 44px;
+  border-top: 1px solid color-mix(in srgb, var(--accent-current) 20%, transparent);
+}
+
+/* ---------- Glossary ---------- */
+.glossary-section {
+  margin-top: 3rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.glossary-list {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.glossary-list dt {
+  font-family: var(--header-font);
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.glossary-list dd {
+  margin: 0 0 0 0;
+  padding: 0 6px;
+  color: var(--text);
+}
+
+.glossary-list dt.is-flashing,
+.glossary-list dd.is-flashing {
+  background-color: color-mix(in srgb, var(--accent-current) 25%, transparent);
+}
+
+.glossary-link {
+  color: var(--accent-current);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.glossary-link:hover {
+  text-decoration: underline;
+}
+
+.exceljet-link {
+  color: var(--accent-current);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-current);
+}
+
+.exceljet-link:hover {
+  text-decoration: underline;
+  border-bottom: none;
+  text-underline-offset: 3px;
+}
+
+.exceljet-icon {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  margin-left: 2px;
+  text-decoration: none;
+}
+
+.glossary-list dt code .exceljet-link {
+  color: var(--accent-current);
+}
+
+/* ---------- Blockquote (non-reveal) ---------- */
+.article-body blockquote {
+  margin: 1.2rem 0;
+  padding: 0.4rem 1rem;
+  border-left: 3px solid var(--seafoam);
+  color: var(--text-muted);
+  background: #f4f9f9;
+}
+
+/* ---------- Landing page ---------- */
+.landing-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 36px 28px 96px;
+}
+
+.landing-hero {
+  padding: 16px 0 30px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+
+.landing-title {
+  font-family: var(--header-font);
+  font-size: 2.3rem;
+  margin: 0 0 12px;
+  color: var(--navy);
+}
+
+.landing-blurb {
+  max-width: 66ch;
+  color: var(--text);
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.landing-blurb code {
+  font-family: var(--mono-font);
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  font-size: 0.94em;
+}
+
+.landing-group {
+  margin-bottom: 32px;
+}
+
+.landing-group-title {
+  font-family: var(--header-font);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  letter-spacing: 0.01em;
+}
+
+.landing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.landing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--card-accent, var(--teal-base));
+  padding: 20px 20px 22px;
+  background: #fff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  min-height: 210px;
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 35, 50, 0.08);
+  border-color: var(--card-accent);
+}
+
+.landing-card-num {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+.landing-card-label {
+  font-family: var(--header-font);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.landing-card-title {
+  font-family: var(--header-font);
+  font-size: 1.1rem;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.landing-card-summary {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+.landing-card-cta {
+  font-family: var(--header-font);
+  font-size: 14px;
+  color: var(--card-accent);
+  font-weight: 600;
+}
+
+/* ---------- Print fallback ---------- */
+@media print {
+  .topnav, .toc, .progress-bar, .copy-btn, .reveal-btn, .toc-toggle, .topnav-toggle { display: none !important; }
+  .reveal-content { display: block !important; }
+  .page-shell { display: block; }
+}
+
+</style>
+</head>
+<body>
+<div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
+<div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
+<nav class="topnav" aria-label="Primary">
+  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+<g clip-path="url(#clip0_9485_462)">
+<rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
+<rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
+<rect x="30.6932" y="48" width="26.7006" height="4" transform="rotate(-180 30.6932 48)" fill="url(#paint2_linear_9485_462)"/>
+<rect x="3.99261" y="48" width="3.99261" height="46" transform="rotate(-180 3.99261 48)" fill="url(#paint3_linear_9485_462)"/>
+<path d="M13.7246 29.6081H15.3141V18.4104H13.7246V16.25H20.5675C21.7226 16.25 22.5279 16.3376 23.3359 16.664C24.7294 17.2108 25.6884 18.5193 25.6884 20.2444C25.6884 21.6856 24.9917 22.9304 23.7916 23.5621V23.6072C25.5136 24.1301 26.2977 25.6376 26.2977 27.2752C26.2977 29.4356 24.9042 30.9856 23.2247 31.4872C22.4617 31.7049 21.7437 31.75 20.9145 31.75H13.7246V29.6108V29.6081ZM20.8934 22.58C22.1146 22.58 22.7902 21.7281 22.7902 20.5497C22.7902 19.7853 22.5067 19.1085 21.8974 18.782C21.5265 18.6068 21.1132 18.5405 20.5675 18.5405H18.17V22.58H20.8934ZM21.047 29.4568C21.4179 29.4568 21.8312 29.4117 22.157 29.2817C22.9412 28.9552 23.3995 28.082 23.3995 27.1C23.3995 25.7676 22.5703 24.852 21.1556 24.852H18.17V29.4595H21.047V29.4568Z" fill="currentColor"/>
+<path d="M28.1961 29.6104H29.7859V18.4108H28.1961V16.25H34.2559V18.4108H32.6422V29.6104H34.2559V31.75H28.1961V29.6104Z" fill="currentColor"/>
+</g>
+<path d="M59.8891 14H60.912L64.1896 18.8C64.461 19.1974 64.8055 19.8667 64.8055 19.8667H64.8264C64.8264 19.8667 64.7533 19.2078 64.7533 18.8V14H65.7867V21.383H64.7742L61.4861 16.5935C61.2148 16.1856 60.8703 15.5163 60.8703 15.5163H60.8494C60.8494 15.5163 60.9225 16.1752 60.9225 16.5935V21.383H59.8891V14Z" fill="currentColor"/>
+<path d="M69.9281 15.966C71.5042 15.966 72.7777 17.1268 72.7777 18.7268C72.7777 20.3268 71.5042 21.5085 69.9281 21.5085C68.3519 21.5085 67.0784 20.3372 67.0784 18.7268C67.0784 17.1163 68.3519 15.966 69.9281 15.966ZM69.9281 20.6301C70.9301 20.6301 71.7443 19.8353 71.7443 18.7268C71.7443 17.6183 70.9301 16.8444 69.9281 16.8444C68.926 16.8444 68.1118 17.6287 68.1118 18.7268C68.1118 19.8248 68.9364 20.6301 69.9281 20.6301Z" fill="currentColor"/>
+<path d="M73.8528 16.0915H74.834V17.0118C74.834 17.2314 74.8131 17.4091 74.8131 17.4091H74.834C75.0741 16.6353 75.6899 16.0287 76.5041 16.0287C76.6398 16.0287 76.765 16.0497 76.765 16.0497V17.0536C76.765 17.0536 76.6293 17.0222 76.4728 17.0222C75.8256 17.0222 75.2306 17.4823 74.9905 18.2667C74.8966 18.5699 74.8653 18.8941 74.8653 19.2183V21.383H73.8528V16.0915Z" fill="currentColor"/>
+<path d="M77.2765 16.0915H78.3516L79.4476 19.8039C79.5311 20.0758 79.5729 20.3686 79.5833 20.3686H79.6042C79.6042 20.3686 79.6564 20.0758 79.7399 19.8039L80.8881 16.1019H81.8171L82.9549 19.8039C83.0384 20.0758 83.101 20.3686 83.101 20.3686H83.1219C83.1219 20.3686 83.1636 20.0758 83.2471 19.8039L84.3536 16.0915H85.4183L83.7169 21.383H82.6L81.504 17.9843C81.4205 17.7124 81.3578 17.4091 81.3578 17.4091H81.3369C81.3369 17.4091 81.2743 17.7124 81.1908 17.9843L80.1052 21.383H78.9779L77.2765 16.0915Z" fill="currentColor"/>
+<path d="M88.4375 15.966C89.9302 15.966 90.7235 17.0745 90.7235 18.4444C90.7235 18.5804 90.6922 18.8837 90.6922 18.8837H86.8405C86.8927 20.0444 87.7173 20.6301 88.6567 20.6301C89.5962 20.6301 90.2225 20.0131 90.2225 20.0131L90.64 20.7555C90.64 20.7555 89.8571 21.5085 88.5941 21.5085C86.9345 21.5085 85.7967 20.3059 85.7967 18.7372C85.7967 17.0536 86.9345 15.966 88.4375 15.966ZM89.6901 18.1203C89.6588 17.2104 89.0952 16.7712 88.4167 16.7712C87.6443 16.7712 87.018 17.2523 86.8718 18.1203H89.6901Z" fill="currentColor"/>
+<path d="M93.7949 22.7006C94.7135 22.7006 95.465 22.2928 95.465 21.2157V20.8287C95.465 20.6614 95.4755 20.4941 95.4755 20.4941H95.4546C95.1415 21.017 94.6509 21.3203 93.8889 21.3203C92.4171 21.3203 91.5298 20.1386 91.5298 18.6118C91.5298 17.085 92.3753 15.966 93.8367 15.966C95.1101 15.966 95.4964 16.7503 95.4964 16.7503H95.5172C95.5172 16.7503 95.5068 16.6771 95.5068 16.583V16.0915H96.4775V21.1634C96.4775 22.9098 95.1519 23.5791 93.8158 23.5791C93.1791 23.5791 92.5215 23.4013 92.01 23.1399L92.344 22.3451C92.344 22.3451 93.0016 22.7006 93.7949 22.7006ZM95.4859 18.6222C95.4859 17.2418 94.8179 16.8444 93.9933 16.8444C93.0747 16.8444 92.5528 17.5137 92.5528 18.5908C92.5528 19.668 93.1373 20.4418 94.0872 20.4418C94.8179 20.4418 95.4859 20.0026 95.4859 18.6222Z" fill="currentColor"/>
+<path d="M97.8972 14H98.9201V15.0353H97.8972V14ZM97.9076 16.0915H98.9201V21.383H97.9076V16.0915Z" fill="currentColor"/>
+<path d="M103.142 18.0784H103.372V17.9843C103.372 17.1163 102.881 16.8235 102.213 16.8235C101.399 16.8235 100.742 17.3359 100.742 17.3359L100.324 16.5935C100.324 16.5935 101.086 15.966 102.297 15.966C103.633 15.966 104.384 16.698 104.384 18.0366V21.383H103.445V20.881C103.445 20.6405 103.466 20.4627 103.466 20.4627H103.445C103.445 20.4627 103.017 21.5085 101.754 21.5085C100.846 21.5085 99.9587 20.9542 99.9587 19.898C99.9587 18.1516 102.255 18.0784 103.142 18.0784ZM101.973 20.6928C102.829 20.6928 103.382 19.7935 103.382 19.0091V18.8418H103.121C102.359 18.8418 100.982 18.8941 100.982 19.8457C100.982 20.2745 101.316 20.6928 101.973 20.6928Z" fill="currentColor"/>
+<path d="M105.773 16.0915H106.754V16.7921C106.754 17.0013 106.733 17.1791 106.733 17.1791H106.754C106.963 16.7189 107.589 15.966 108.737 15.966C109.979 15.966 110.553 16.6457 110.553 17.9948V21.383H109.541V18.2248C109.541 17.4823 109.384 16.8967 108.539 16.8967C107.693 16.8967 107.088 17.4301 106.869 18.1935C106.806 18.4026 106.785 18.6431 106.785 18.9046V21.383H105.773V16.0915Z" fill="currentColor"/>
+<path d="M59.8891 26.2876H62.4673C63.7095 26.2876 64.6072 26.9778 64.6072 28.1699C64.6072 28.8915 64.2523 29.4667 63.6886 29.7595V29.7804C64.461 30.0105 64.8994 30.7425 64.8994 31.5686C64.8994 32.9595 63.8243 33.6706 62.53 33.6706H59.8891V26.2876ZM62.4673 29.3935C63.1354 29.3935 63.5529 28.9229 63.5529 28.2745C63.5529 27.6262 63.1563 27.1869 62.4465 27.1869H60.9225V29.3935H62.4673ZM62.5822 32.7713C63.3755 32.7713 63.8452 32.2693 63.8452 31.5164C63.8452 30.7634 63.3441 30.251 62.5717 30.251H60.9225V32.7713H62.5822Z" fill="currentColor"/>
+<path d="M66.1337 28.3791H67.1462V31.5373C67.1462 32.2693 67.2924 32.8549 68.1379 32.8549C69.213 32.8549 69.8497 31.9033 69.8497 30.8575V28.3791H70.8622V33.6706H69.881V32.9699C69.881 32.7503 69.9019 32.583 69.9019 32.583H69.881C69.6618 33.1059 68.9729 33.7961 67.9395 33.7961C66.7496 33.7961 66.1337 33.1686 66.1337 31.7673V28.3791Z" fill="currentColor"/>
+<path d="M72.381 32.3007C72.381 32.3007 72.976 32.9177 73.8945 32.9177C74.3329 32.9177 74.7713 32.6876 74.7713 32.2588C74.7713 31.2863 72.0574 31.485 72.0574 29.7595C72.0574 28.7974 72.9133 28.2536 73.9676 28.2536C75.1262 28.2536 75.669 28.8392 75.669 28.8392L75.2619 29.6026C75.2619 29.6026 74.7922 29.132 73.9571 29.132C73.5187 29.132 73.0908 29.3203 73.0908 29.7804C73.0908 30.732 75.8047 30.5229 75.8047 32.2588C75.8047 33.1373 75.0532 33.7961 73.8945 33.7961C72.6002 33.7961 71.8904 33.0222 71.8904 33.0222L72.381 32.3007Z" fill="currentColor"/>
+<path d="M76.859 26.2876H77.882V27.3229H76.859V26.2876ZM76.8694 28.3791H77.882V33.6706H76.8694V28.3791Z" fill="currentColor"/>
+<path d="M79.3015 28.3791H80.2827V29.0797C80.2827 29.2889 80.2618 29.4667 80.2618 29.4667H80.2827C80.4915 29.0065 81.1178 28.2536 82.266 28.2536C83.5081 28.2536 84.0822 28.9333 84.0822 30.2824V33.6706H83.0697V30.5124C83.0697 29.7699 82.9131 29.1843 82.0676 29.1843C81.2221 29.1843 80.6167 29.7177 80.3975 30.4811C80.3349 30.6902 80.314 30.9307 80.314 31.1922V33.6706H79.3015V28.3791Z" fill="currentColor"/>
+<path d="M87.7669 28.2536C89.2596 28.2536 90.0529 29.3621 90.0529 30.732C90.0529 30.868 90.0216 31.1712 90.0216 31.1712H86.1699C86.222 32.332 87.0467 32.9177 87.9861 32.9177C88.9255 32.9177 89.5518 32.3007 89.5518 32.3007L89.9694 33.0431C89.9694 33.0431 89.1865 33.7961 87.9235 33.7961C86.2638 33.7961 85.126 32.5935 85.126 31.0248C85.126 29.3412 86.2638 28.2536 87.7669 28.2536ZM89.0195 30.4079C88.9882 29.498 88.4245 29.0588 87.746 29.0588C86.9736 29.0588 86.3473 29.5399 86.2012 30.4079H89.0195Z" fill="currentColor"/>
+<path d="M91.2324 32.3007C91.2324 32.3007 91.8273 32.9177 92.7459 32.9177C93.1843 32.9177 93.6227 32.6876 93.6227 32.2588C93.6227 31.2863 90.9088 31.485 90.9088 29.7595C90.9088 28.7974 91.7647 28.2536 92.819 28.2536C93.9776 28.2536 94.5204 28.8392 94.5204 28.8392L94.1133 29.6026C94.1133 29.6026 93.6436 29.132 92.8085 29.132C92.3701 29.132 91.9422 29.3203 91.9422 29.7804C91.9422 30.732 94.6561 30.5229 94.6561 32.2588C94.6561 33.1373 93.9045 33.7961 92.7459 33.7961C91.4516 33.7961 90.7418 33.0222 90.7418 33.0222L91.2324 32.3007Z" fill="currentColor"/>
+<path d="M95.7756 32.3007C95.7756 32.3007 96.3705 32.9177 97.2891 32.9177C97.7275 32.9177 98.1659 32.6876 98.1659 32.2588C98.1659 31.2863 95.452 31.485 95.452 29.7595C95.452 28.7974 96.3079 28.2536 97.3622 28.2536C98.5208 28.2536 99.0636 28.8392 99.0636 28.8392L98.6565 29.6026C98.6565 29.6026 98.1868 29.132 97.3517 29.132C96.9133 29.132 96.4854 29.3203 96.4854 29.7804C96.4854 30.732 99.1993 30.5229 99.1993 32.2588C99.1993 33.1373 98.4477 33.7961 97.2891 33.7961C95.9948 33.7961 95.285 33.0222 95.285 33.0222L95.7756 32.3007Z" fill="currentColor"/>
+<path d="M103.302 32.0392C103.302 32.0392 104.084 32.834 105.18 32.834C105.869 32.834 106.454 32.4471 106.454 31.7464C106.454 30.1464 102.884 30.4915 102.884 28.2222C102.884 27.0719 103.876 26.1621 105.264 26.1621C106.652 26.1621 107.352 26.9046 107.352 26.9046L106.882 27.7621C106.882 27.7621 106.203 27.1242 105.264 27.1242C104.481 27.1242 103.928 27.6157 103.928 28.2013C103.928 29.7281 107.498 29.3203 107.498 31.7151C107.498 32.8549 106.621 33.7961 105.16 33.7961C103.594 33.7961 102.717 32.8235 102.717 32.8235L103.302 32.0392Z" fill="currentColor"/>
+<path d="M111.12 28.2536C112.445 28.2536 113.103 29.0275 113.103 29.0275L112.623 29.7386C112.623 29.7386 112.059 29.132 111.161 29.132C110.097 29.132 109.324 29.9268 109.324 31.0144C109.324 32.102 110.097 32.9177 111.193 32.9177C112.174 32.9177 112.821 32.2065 112.821 32.2065L113.228 32.949C113.228 32.949 112.498 33.7961 111.12 33.7961C109.46 33.7961 108.291 32.6144 108.291 31.0248C108.291 29.4353 109.46 28.2536 111.12 28.2536Z" fill="currentColor"/>
+<path d="M114.183 26.2876H115.196V28.9961C115.196 29.2471 115.175 29.4353 115.175 29.4353H115.196C115.425 28.9229 116.094 28.2536 117.148 28.2536C118.39 28.2536 118.964 28.9333 118.964 30.2824V33.6706H117.952V30.5124C117.952 29.77 117.795 29.1843 116.949 29.1843C116.156 29.1843 115.499 29.7281 115.279 30.4915C115.217 30.7007 115.196 30.9412 115.196 31.1922V33.6706H114.183V26.2876Z" fill="currentColor"/>
+<path d="M122.85 28.2536C124.426 28.2536 125.699 29.4144 125.699 31.0144C125.699 32.6144 124.426 33.7961 122.85 33.7961C121.273 33.7961 120 32.6248 120 31.0144C120 29.4039 121.273 28.2536 122.85 28.2536ZM122.85 32.9177C123.852 32.9177 124.666 32.1229 124.666 31.0144C124.666 29.9059 123.852 29.132 122.85 29.132C121.848 29.132 121.033 29.9163 121.033 31.0144C121.033 32.1124 121.858 32.9177 122.85 32.9177Z" fill="currentColor"/>
+<path d="M129.274 28.2536C130.85 28.2536 132.124 29.4144 132.124 31.0144C132.124 32.6144 130.85 33.7961 129.274 33.7961C127.698 33.7961 126.425 32.6248 126.425 31.0144C126.425 29.4039 127.698 28.2536 129.274 28.2536ZM129.274 32.9177C130.276 32.9177 131.091 32.1229 131.091 31.0144C131.091 29.9059 130.276 29.132 129.274 29.132C128.272 29.132 127.458 29.9163 127.458 31.0144C127.458 32.1124 128.283 32.9177 129.274 32.9177Z" fill="currentColor"/>
+<path d="M133.168 26.2876H134.18V32.0497C134.18 32.6876 134.431 32.8026 134.744 32.8026C134.838 32.8026 134.921 32.7922 134.921 32.7922V33.6915C134.921 33.6915 134.765 33.7124 134.587 33.7124C134.013 33.7124 133.168 33.5556 133.168 32.2275V26.2876Z" fill="currentColor"/>
+<defs>
+<linearGradient id="paint0_linear_9485_462" x1="43.9187" y1="0" x2="18.2035" y2="-5.03381" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_9485_462" x1="45.7902" y1="4" x2="45.7787" y2="32.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<linearGradient id="paint2_linear_9485_462" x1="57.3937" y1="48" x2="31.6786" y2="42.9662" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#24A5E2" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint3_linear_9485_462" x1="5.86415" y1="52" x2="5.8526" y2="80.125" gradientUnits="userSpaceOnUse">
+<stop stop-color="#24A5E2"/>
+<stop offset="1" stop-color="#066CB4"/>
+</linearGradient>
+<clipPath id="clip0_9485_462">
+<rect width="47.9113" height="48" fill="white"/>
+</clipPath>
+</defs>
+</svg></span></a>
+  <div class="topnav-groups">
+    <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
+      <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
+      <a class="topnav-link" href="part1_exercise2.html">Ex2</a>
+      <a class="topnav-link" href="part1_exercise3.html">Ex3</a>
+    </div>
+    <div class="topnav-group topnav-p2"><span class="topnav-label">Part 2:</span>
+      <a class="topnav-link" href="part2_task1.html">T1</a>
+      <a class="topnav-link is-active" href="part2_task2.html">T2</a>
+      <a class="topnav-link" href="part2_task3.html">T3</a>
+    </div>
+  </div>
+  <button class="topnav-toggle" aria-label="Toggle navigation" type="button">Menu</button>
+</nav>
+<div class="page-shell">
+  <header class="page-header">
+    <div class="page-breadcrumb">Part 2 · Task 2</div>
+    <h1>Task 2 — Monthly averages, two different ways</h1>
+    <div class="page-title-rule" aria-hidden="true"></div>
+    <p class="page-sub">Task 2: ExcelScript continued</p>
+  </header>
+  <aside class="toc" aria-label="Table of contents">
+  <div class="toc-label">Contents</div>
+  <button class="toc-toggle" type="button" aria-controls="toc-list" aria-expanded="false">Contents</button>
+  <ul id="toc-list" class="toc-list">
+    <li class="toc-l2"><a href="#what-this-task-is-really-about"><span class="toc-marker">01</span><span class="toc-text">What this task is really about</span></a>
+    </li>
+    <li class="toc-l2"><a href="#how-to-read-the-exam-wording"><span class="toc-marker">02</span><span class="toc-text">How to read the exam wording</span></a>
+    </li>
+    <li class="toc-l2"><a href="#the-minimum-viable-click-through-version"><span class="toc-marker">03</span><span class="toc-text">The minimum-viable, click-through version</span></a>
+    </li>
+    <li class="toc-l2"><a href="#pivot-table-path-the-walkthrough"><span class="toc-marker">04</span><span class="toc-text">Pivot-table path — the walkthrough</span></a>
+    </li>
+    <li class="toc-l2"><a href="#formula-path-the-lambda-story"><span class="toc-marker">05</span><span class="toc-text">Formula path — the LAMBDA story</span></a>
+    </li>
+    <li class="toc-l2"><a href="#which-one-to-pick"><span class="toc-marker">06</span><span class="toc-text">Which one to pick</span></a>
+    </li>
+    <li class="toc-l2"><a href="#an-alternative-worth-mentioning"><span class="toc-marker">07</span><span class="toc-text">An alternative worth mentioning</span></a>
+    </li>
+    <li class="toc-l2"><a href="#if-this-still-feels-shaky"><span class="toc-marker">08</span><span class="toc-text">If this still feels shaky</span></a>
+    </li>
+    <li class="toc-l2"><a href="#glossary"><span class="toc-marker toc-marker-gloss">—</span><span class="toc-text">Glossary</span></a>
+    </li>
+  </ul>
+</aside>
+  <main class="article-body">
+    <h2 id="what-this-task-is-really-about">What this task is really about</h2>
+<p>You have a long daily table (the <code>BIKE</code> table, 730-odd rows, one row per day across 2011 and 2012) and you need a short monthly table (24 rows, one per month) with two columns of averages: average temperature for the month, and average number of users for the month. The user-type dropdown from Task 1 controls which underlying users column gets averaged, through the <code>Users</code> column you built in Task 1 — so Task 2 just has to believe that <code>[Users]</code> is already the right number.</p>
+<p>The exam explicitly says either a formula solution or a <a class="glossary-link" href="#glossary-pivot-table" data-target="glossary-pivot-table">pivot table</a> counts, and the canonical solution demonstrates both. This report does the same. The pivot is the shorter route and the one most students will pick; the formula version uses <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> and is a real exercise in reasoning about arrays. Either one gets full marks for Task 2. If you pick the pivot you'll need it again for Task 3 anyway, and you'll want the formula version if your markers are nudging you towards the harder route.</p>
+<h2 id="how-to-read-the-exam-wording">How to read the exam wording</h2>
+<p>"Per month-year pair in the dataset" means you want one row per distinct combination of year and month — 2011-01, 2011-02, all the way through 2012-12. That's 24 rows. "The selected <code>userType</code>" is the dropdown; because the <code>Users</code> column on the <code>BIKE</code> table already reads the dropdown, all you need to do is average that column and the <code>temp</code> column grouped by <code>MonthYear</code>.</p>
+<p>A <em>pivot table</em> is Excel's grouping-and-aggregating tool. You tell it "put this field on the rows, put this field in the values area, aggregate it with this function", and it builds the grouped table for you. <em>Aggregate</em> means reducing many numbers to one — sum, average, count, min, max. <em><a class="glossary-link" href="#glossary-row-field" data-target="glossary-row-field">Row field</a></em> is the column whose <a class="glossary-link" href="#glossary-unique" data-target="glossary-unique">unique</a> values become the row labels. <em>Data field</em> (also called <em>value field</em>) is the column whose values get aggregated. If your data has 731 rows and you pivot on <code>MonthYear</code> as a row field with <code>Users</code> as a data field summarised by average, you get 24 rows, each one being the mean of all that month's users.</p>
+<p>The note in the exam wording — "if you use a PivotTable you will have to refresh the PivotTable when you change the userType dropdown" — matters. Pivot tables cache their data; they don't recalculate automatically when a dependency changes. If the user picks a different dropdown value, the <code>Users</code> column on the <code>BIKE</code> table updates instantly, but the pivot keeps showing the old numbers until you refresh. The canonical script doesn't solve this — it would need a separate refresh script the user triggers. The formula version doesn't have this problem: Excel formulas are live.</p>
+<h2 id="the-minimum-viable-click-through-version">The minimum-viable, click-through version</h2>
+<p>Manual pivot: select any cell inside the <code>BIKE</code> table → Insert → PivotTable → place it on <code>Questions</code>. Drag <code>MonthYear</code> into Rows, <code>temp</code> and <code>Users</code> both into Values. Click the little arrow next to each value field and choose Summarize by → Average. Turn off column grand totals. Done. That took about forty seconds once you know where the buttons are.</p>
+<p>The script version reproduces those clicks in code. The formula version rebuilds the same output without a pivot at all. Both produce a 24-row table with three columns (date, average temp, average users).</p>
+<h2 id="pivot-table-path-the-walkthrough">Pivot-table path — the walkthrough</h2>
+<p>The canonical pivot code lives in <code>Q2pTable</code>. Four lines set up the pivot shape, one loop switches both value fields to averages, and one line hides the grand totals. All six lines are worth reading carefully — method signatures in the ExcelScript API are easy to mix up.</p>
+<p>Start by placing the pivot:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">let pTable = Qs.addPivotTable(&quot;Q2MonthlyAverages&quot;, bike, Qs.getCell(19, 1));
+</code></pre></div>
+<p><code>addPivotTable</code> takes three things: a name (<code>"Q2MonthlyAverages"</code> — visible later in the pivot-tables pane), the source (the <code>BIKE</code> table, referenced by the <code>bike</code> variable set up in <code>main</code>), and the destination cell (<code>getCell(19, 1)</code> = row 20, column B, written <code>B20</code> in Excel's 1-based address). After this line the workbook has an empty pivot sitting on <code>Questions</code> at <code>B20</code>. No rows, no values yet — you've only told Excel where it goes and what feeds it.</p>
+<p>Next, pin the row field and the two data fields:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">pTable.addRowHierarchy(pTable.getHierarchy(&quot;MonthYear&quot;));
+let temp = pTable.addDataHierarchy(pTable.getHierarchy(&quot;temp&quot;));
+let users = pTable.addDataHierarchy(pTable.getHierarchy(&quot;Users&quot;));
+</code></pre></div>
+<p>A <em>hierarchy</em>, in pivot-table terminology, is what the API calls a column you can drop into the Rows/Columns/Values areas. <code>getHierarchy("MonthYear")</code> grabs the <code>MonthYear</code> column; <code>addRowHierarchy</code> puts it in the Rows area — that's what makes each unique month become a row label. <code>addDataHierarchy</code> puts a column in the Values area. After these three lines the pivot has one row per month and two value columns, both defaulting to SUM.</p>
+<p>Default <a class="glossary-link" href="#glossary-aggregation" data-target="glossary-aggregation">aggregation</a> in Excel is SUM for numeric columns, and that's not what the exam asked for. Switch both to average:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">for (let x of [temp, users]) {
+    x.setSummarizeBy(ExcelScript.AggregationFunction.average);
+}
+</code></pre></div>
+<p>This is a <code>for…of</code> loop — it just runs the body once per item in the array, binding <code>x</code> to each in turn. The body calls <code>setSummarizeBy</code> with a value from an <em><a class="glossary-link" href="#glossary-enum" data-target="glossary-enum">enum</a></em>. An enum is a fixed list of named constants; <code>ExcelScript.AggregationFunction.average</code> is the "average" member of the <code>AggregationFunction</code> enum, equivalent to choosing "Average" in the GUI's Summarize-by menu. Other members include <code>sum</code>, <code>count</code>, <code>min</code>, <code>max</code>.</p>
+<p>The headers Excel writes for the two value columns will now be "Average of temp" and "Average of Users". That's the default label — you could rename them with <code>temp.setName("Temperature")</code> if you want, but the canonical solution doesn't bother.</p>
+<p>Finally, kill the grand totals row:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">pTable.getLayout().setShowColumnGrandTotals(false);
+return pTable;
+</code></pre></div>
+<p><code>getLayout()</code> reaches the layout object, which holds the settings you'd find under PivotTable → Design → Grand Totals in the GUI. The script turns off column grand totals — for this pivot that hides the bottom "<a class="glossary-link" href="#glossary-grand-total" data-target="glossary-grand-total">Grand Total</a>" row that would otherwise sum the monthly averages across the whole range, which is not a meaningful number.</p>
+<p>After all this, <code>B20:D44</code> on <code>Questions</code> holds a pivot that looks like:</p>
+<div class="code-block"><button class="copy-btn" type="button">Copy</button><pre><code>Row Labels           Average of temp    Average of Users
+01/01/2011           8.106              1231.9
+02/01/2011           11.584             1721.9
+...
+</code></pre></div>
+<p><em>Methods used: <code>addPivotTable</code>, <code>getHierarchy</code>, <code>addRowHierarchy</code>, <code>addDataHierarchy</code>, <code>setSummarizeBy</code>, <code>getLayout</code>, <code>setShowColumnGrandTotals</code> — see pivottable.pdf and workbook_worksheet.pdf.</em></p>
+<p>The thing that will go wrong: if the dropdown on <code>B12</code> changes, the <code>Users</code> column on the <code>BIKE</code> table recomputes immediately, but the pivot cache still holds the old numbers. The pivot will visually not update. Marker-friendly solution: add a button or a separate script that calls <code>pTable.refresh()</code> after the dropdown change. The canonical script doesn't include this because it's an architectural decision, not a correctness one.</p>
+<h2 id="formula-path-the-lambda-story">Formula path — the LAMBDA story</h2>
+<p>The formula solution builds a single dynamic-<a class="glossary-link" href="#glossary-array-formula" data-target="glossary-array-formula">array formula</a> that produces the same 24-row, 3-column output without a pivot. It's packaged as a <a class="glossary-link" href="#glossary-named-lambda" data-target="glossary-named-lambda">named LAMBDA</a> called <code>getQ2Averages</code>, and a single cell calls it with <code>=getQ2Averages(BIKE)</code>. When that formula runs it <em>spills</em> a block of values across F23:H47 — a whole region filled from one formula.</p>
+<p>A <em><a class="glossary-link" href="#glossary-dynamic-array" data-target="glossary-dynamic-array">dynamic array</a></em> is a formula that returns more than one value and fills a rectangle of cells starting from the cell it's written in. A <em>spill range</em> is that rectangle. If any of the target cells already contain data, the formula errors with <code>#SPILL!</code>. You can see if a cell is the origin of a spill because it shows the whole block highlighted with a blue outline when selected.</p>
+<p>Before diving into the canonical formula, a pause for the underlying idea.</p>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Pause.</strong>You have 24 months of data and the <code>BIKE[MonthYear]</code> column repeats each month-value about 30 times. How would you take the list of 24 unique months and, for each one, average the <code>temp</code> values that match it? Sketch it in words.</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The plan is: get the 24 unique months; then for each month, <a class="glossary-link" href="#glossary-filter" data-target="glossary-filter">filter</a> the temp column down to just the days in that month and take the average; do the same for users; stack the three columns side-by-side; add a header row on top.</p>
+<p>Now the formula. The canonical script writes it via <code>addNamedItem</code>, escaped with line-continuations. Cleaned up, it reads:</p>
+<div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">=LAMBDA(BIKE,
+  LET(
+    dates,   UNIQUE(BIKE[MonthYear]),
+    temp,    BYROW(dates, LAMBDA(row, AVERAGE(FILTER(BIKE[temp],  BIKE[MonthYear] = row)))),
+    user,    BYROW(dates, LAMBDA(row, AVERAGE(FILTER(BIKE[Users], BIKE[MonthYear] = row)))),
+    headers, {&quot;Date&quot;, &quot;Temperature&quot;, &quot;Users&quot;},
+    body,    HSTACK(dates, temp, user),
+    VSTACK(headers, body)
+  )
+)
+</code></pre></div></div></div>
+<p>Five new functions appear here. None were covered in lecture; all are worth introducing once before you look at how they fit together.</p>
+<p><strong><code>LAMBDA(args..., expression)</code></strong> wraps a formula into a reusable function. <code>LAMBDA(x, x * 2)</code> is a function that doubles its <a class="glossary-link" href="#glossary-argument" data-target="glossary-argument">argument</a>. You can't call a bare LAMBDA directly in a cell — you either wrap it in <code>addNamedItem</code> so it has a name, or you call it inline: <code>=LAMBDA(x, x * 2)(5)</code> evaluates to <code>10</code>. Saving it as a named item (what the script does via <code>Qs.addNamedItem("getQ2Averages", ...)</code>) makes <code>=getQ2Averages(BIKE)</code> work like any built-in function.</p>
+<p><strong><code>LET(name1, value1, name2, value2, ..., final_expression)</code></strong> is the formula equivalent of declaring local variables. Each pair is a name followed by the value it should hold; the last argument is the expression that actually returns something. <code>=LET(a, 3, b, 4, a + b)</code> returns <code>7</code>. <a class="glossary-link" href="#glossary-let" data-target="glossary-let">LET</a> exists so you can name intermediate steps instead of nesting seven things inside one formula.</p>
+<p><strong><code>UNIQUE(array)</code></strong> returns the distinct values from a one-column (or one-row) array, keeping order. <code>UNIQUE({1; 2; 1; 3; 2})</code> returns <code>{1; 2; 3}</code>.</p>
+<p><strong><code>FILTER(array, boolean_array)</code></strong> returns only the rows of <code>array</code> where the corresponding entry in <code>boolean_array</code> is <code>TRUE</code>. <code>FILTER({10;20;30;40}, {TRUE;FALSE;TRUE;FALSE})</code> returns <code>{10; 30}</code>. The boolean array is usually built from a comparison: <code>BIKE[MonthYear] = row</code> returns a column of <code>TRUE</code>/<code>FALSE</code>, one per row in the <code>BIKE</code> table.</p>
+<p><strong><code>BYROW(array, lambda)</code></strong> takes a 2D array and applies the lambda to each row, returning one value per row. If <code>array</code> has 24 rows, you get 24 values back. The lambda receives each row as its argument.</p>
+<p><strong><code>HSTACK(...)</code></strong> glues arrays horizontally (side by side). <strong><code>VSTACK(...)</code></strong> glues them vertically (top to bottom). Both care about matching dimensions — <a class="glossary-link" href="#glossary-hstack" data-target="glossary-hstack">HSTACK</a> needs the same number of rows, <a class="glossary-link" href="#glossary-vstack" data-target="glossary-vstack">VSTACK</a> needs the same number of columns.</p>
+<p>With that vocabulary, the LET locals read as a short pipeline.</p>
+<p>Walking the locals in dependency order, with a miniature example — imagine the <code>BIKE</code> table has just two months of data, January and February 2011, four rows per month:</p>
+<p><strong><code>dates</code></strong> is <code>UNIQUE(BIKE[MonthYear])</code>. In the mini-example that's a 2-row, 1-column array: <code>{01/01/2011; 01/02/2011}</code>. In the real data it's 24 rows.</p>
+<p><strong><code>temp</code></strong> is where it gets dense. <code>BYROW(dates, LAMBDA(row, ...))</code> runs the lambda once per entry in <code>dates</code>. For the first entry (<code>01/01/2011</code>), <code>row</code> equals <code>01/01/2011</code>, so <code>FILTER(BIKE[temp], BIKE[MonthYear] = row)</code> returns only the temperature values where MonthYear equals January 2011 — all 31 of them. <code>AVERAGE(...)</code> collapses those 31 values to one. <a class="glossary-link" href="#glossary-byrow" data-target="glossary-byrow">BYROW</a> then does the same for February, and so on. <code>temp</code> ends up as a 24-row, 1-column array of per-month average temperatures.</p>
+<p><strong><code>user</code></strong> is structurally identical, just swapped for the <code>Users</code> column. 24 rows, 1 column, one average per month.</p>
+<p><strong><code>headers</code></strong> is <code>{"Date", "Temperature", "Users"}</code>. Curly-brace syntax with commas makes a horizontal 1×3 literal array. Semicolons would make it vertical. This is the header row the final output wants.</p>
+<p><strong><code>body</code></strong> is <code>HSTACK(dates, temp, user)</code>. Three 24-row, 1-column arrays stacked side by side produce a single 24-row, 3-column array — the data body, without headers.</p>
+<p>The final return is <code>VSTACK(headers, body)</code> — a 1×3 array stacked on top of a 24×3 array gives a 25×3 result. That's what spills into F23:H47 when the cell formula <code>=getQ2Averages(BIKE)</code> is run.</p>
+<p><em>Methods used: <code>addNamedItem</code> (worksheet-scoped, because <code>Qs.addNamedItem</code> rather than <code>workbook.addNamedItem</code>), <code>setFormula</code>, <code>getAbsoluteResizedRange</code>, <code>getSurroundingRegion</code>, <code>getRowCount</code>, <code>setNumberFormat</code> — see workbook_worksheet.pdf and range.pdf.</em></p>
+<p>The script wraps the formula in a named item first, then writes the call into a single cell, then reformats the date column:</p>
+<div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">Qs.getCell(19, 5).setFormula(&quot;=getQ2Averages(BIKE)&quot;);
+let cell = Qs.getCell(20, 5);
+cell.getAbsoluteResizedRange(cell.getSurroundingRegion().getRowCount() - 1, 1)
+    .setNumberFormat(&quot;mm/yyyy&quot;);
+</code></pre></div>
+<p><code>getCell(19, 5)</code> is <code>F20</code> — where the spill starts. <code>getCell(20, 5)</code> is <code>F21</code>, the first data cell under the header. <code>getSurroundingRegion()</code> returns the whole contiguous block that includes that cell (so, the entire spill). <code>getRowCount() - 1</code> subtracts the header row. <code>getAbsoluteResizedRange(rows, 1)</code> then reshapes the single cell back into a 1-column range of the right height (covering only the date cells under the header). <code>setNumberFormat("mm/yyyy")</code> gives them the same display format as the <code>MonthYear</code> column on the <code>BIKE</code> table.</p>
+<p>The thing that goes wrong: if any of the cells in F22:H47 aren't empty, the spill fails with <code>#SPILL!</code>. This includes any whitespace or leftover formatting you can't see. If you can't make the formula work, clear the destination region first.</p>
+<h2 id="which-one-to-pick">Which one to pick</h2>
+<p>If you want the shortest correct answer, the pivot is six lines, uses concepts the lectures covered, and is hard to get wrong. Its one weakness — needing to be refreshed when the dropdown changes — is a known trade-off and easy to patch with a refresh button if you want to be thorough.</p>
+<p>If you want the more instructive answer, the LAMBDA version teaches you something about array formulas that will show up again if you ever do real data work in Excel. It's also self-refreshing — change the dropdown and the averages update immediately, because the formula reads <code>BIKE[Users]</code> which is itself a formula.</p>
+<p>Practically, a student with limited time should pick the pivot. A student with the LAMBDA version working can submit both, exactly as the canonical solution does — the top text on the <code>Questions</code> sheet in the solutions workbook reads "ONLY ONE APPROACH IS REQUIRED — HERE I DEMONSTRATE BOTH A FORMULA SOLUTION AND A PIVOTTABLE SOLUTION", and neither is penalised.</p>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Try it first.</strong>Build the pivot via the GUI before you script it. Then read the six script lines one by one and match each to a thing you clicked. The script suddenly feels less magical.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden></div></div><h2 id="an-alternative-worth-mentioning">An alternative worth mentioning</h2>
+<p>A third path, not taken by the canonical solution, is a helper-column approach: on the <code>BIKE</code> table, add columns for per-row month averages using <code>AVERAGEIFS</code>, then take <code>UNIQUE(MonthYear)</code> in the destination and look up the values. It works but it bloats the <code>BIKE</code> table with two calculation columns and re-does the same average for every one of the 731 rows. The LAMBDA approach is tidier — it keeps the calculation in one place and only computes each monthly average once.</p>
+<h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
+<p>01PivotTables.pdf walks through the UI side of pivot tables — the drag-and-drop version of what <code>addRowHierarchy</code> and <code>addDataHierarchy</code> are scripting. pivottable.pdf is the method cheatsheet. For the LAMBDA side there's no lecture coverage; reading Microsoft's docs on LAMBDA, LET, BYROW, FILTER, HSTACK, and VSTACK in that order gives you each building block with small examples. range.pdf explains <code>getSurroundingRegion</code> and <code>getAbsoluteResizedRange</code>, which are the two methods in the formula version that most students skim past without noticing.</p>
+    <section class="glossary-section" id="glossary">
+<h2 id="glossary-heading">Glossary</h2>
+<dl class="glossary-list">
+<dt id="glossary-aggregation"><strong>Aggregation</strong></dt><dd><p>a function that reduces many numbers to one: SUM, AVERAGE, COUNT, MIN, MAX. <code>setSummarizeBy(ExcelScript.AggregationFunction.average)</code> sets which aggregation a pivot's data field uses.</p></dd>
+<dt id="glossary-argument"><strong>Argument</strong></dt><dd><p>a value passed to a function when you call it. In <code>AVERAGE(BIKE[temp])</code>, <code>BIKE[temp]</code> is the argument.</p></dd>
+<dt id="glossary-array-formula"><strong>Array formula</strong></dt><dd><p>a formula that works on (or returns) a whole block of values rather than a single number. Modern Excel handles these through dynamic arrays.</p></dd>
+<dt id="glossary-arrow-function"><strong>Arrow function</strong></dt><dd><p>(not used in the canonical code, but likely seen elsewhere) — a compact way to write a function in TypeScript, like <code>(x) =&gt; x * 2</code>.</p></dd>
+<dt id="glossary-byrow"><strong><a class="exceljet-link" href="https://exceljet.net/functions/byrow-function" target="_blank" rel="noopener" title="View BYROW on ExcelJet">BYROW</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that applies a lambda to each row of an array, returning one value per row.</p></dd>
+<dt id="glossary-column-field"><strong>Column field</strong></dt><dd><p>a pivot field dropped into the Columns area. Not used in this exam; the pivot here has a row field but no column field.</p></dd>
+<dt id="glossary-data-field-value-field"><strong>Data field / value field</strong></dt><dd><p>a pivot field dropped into the Values area; its values get aggregated.</p></dd>
+<dt id="glossary-dynamic-array"><strong>Dynamic array</strong></dt><dd><p>a formula that returns multiple values and fills a rectangle starting at the formula cell.</p></dd>
+<dt id="glossary-enum"><strong>Enum</strong></dt><dd><p>a named set of constants. <code>ExcelScript.AggregationFunction.average</code>, <code>ExcelScript.ChartType.line</code> are enum members.</p></dd>
+<dt id="glossary-filter"><strong><a class="exceljet-link" href="https://exceljet.net/functions/filter-function" target="_blank" rel="noopener" title="View FILTER on ExcelJet">FILTER</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that returns the rows of an array where a boolean condition is true.</p></dd>
+<dt id="glossary-function-typescript"><strong>Function (TypeScript)</strong></dt><dd><p>a reusable block of code that takes arguments and returns a value. <code>main</code>, <code>Q1dataValidation</code>, etc., are functions.</p></dd>
+<dt id="glossary-grand-total"><strong>Grand total</strong></dt><dd><p>a summary row or column a pivot adds by default to show overall totals. Turned off here because averaging the monthly averages doesn't answer a real question.</p></dd>
+<dt id="glossary-hstack"><strong><a class="exceljet-link" href="https://exceljet.net/functions/hstack-function" target="_blank" rel="noopener" title="View HSTACK on ExcelJet">HSTACK</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that concatenates arrays side by side.</p></dd>
+<dt id="glossary-lambda"><strong><a class="exceljet-link" href="https://exceljet.net/functions/lambda-function" target="_blank" rel="noopener" title="View LAMBDA on ExcelJet">LAMBDA</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that wraps a formula into a reusable, callable thing. Saved with a name via <code>addNamedItem</code> so you can call it like a built-in function.</p></dd>
+<dt id="glossary-let"><strong><a class="exceljet-link" href="https://exceljet.net/functions/let-function" target="_blank" rel="noopener" title="View LET on ExcelJet">LET</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that introduces named intermediate values inside a formula, like local variables.</p></dd>
+<dt id="glossary-named-lambda"><strong>Named <a class="exceljet-link" href="https://exceljet.net/functions/lambda-function" target="_blank" rel="noopener" title="View LAMBDA on ExcelJet">LAMBDA</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>a LAMBDA stored as a named item so formulas can call it by name. <code>getQ2Averages</code> is one.</p></dd>
+<dt id="glossary-pivot-table"><strong>Pivot table</strong></dt><dd><p>Excel's grouping-and-aggregating tool. Produces a summary table from a source table.</p></dd>
+<dt id="glossary-return-value"><strong>Return value</strong></dt><dd><p>what a function gives back when called. <code>Q2pTable</code> returns the pivot; <code>getQ2Averages(BIKE)</code> returns a 25×3 array.</p></dd>
+<dt id="glossary-row-field"><strong>Row field</strong></dt><dd><p>a pivot field dropped into the Rows area; its unique values become the row labels.</p></dd>
+<dt id="glossary-spill-spill-range"><strong>Spill / spill range</strong></dt><dd><p>the rectangle of cells a dynamic-array formula fills. If any cell in the range isn't empty, the formula errors with <code>#SPILL!</code>.</p></dd>
+<dt id="glossary-unique"><strong><a class="exceljet-link" href="https://exceljet.net/functions/unique-function" target="_blank" rel="noopener" title="View UNIQUE on ExcelJet">UNIQUE</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that removes duplicates from a list, keeping the first occurrence of each value.</p></dd>
+<dt id="glossary-vstack"><strong><a class="exceljet-link" href="https://exceljet.net/functions/vstack-function" target="_blank" rel="noopener" title="View VSTACK on ExcelJet">VSTACK</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that concatenates arrays top to bottom.</p></dd>
+</dl></section>
+  </main>
+</div>
+<script>
+(function () {
+  const bar = document.querySelector('.progress-bar');
+  const indicator = document.querySelector('.progress-indicator');
+  function onScroll() {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (bar) bar.style.width = p + '%';
+    if (indicator) indicator.textContent = Math.round(p) + '%';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  onScroll();
+
+  document.querySelectorAll('.reveal-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const id = btn.getAttribute('data-target');
+      const content = document.getElementById(id);
+      if (!content) return;
+      content.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      btn.style.display = 'none';
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const container = btn.closest('.code-block');
+      if (!container) return;
+      const pre = container.querySelector('pre');
+      if (!pre) return;
+      const text = pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+      const orig = btn.textContent;
+      btn.textContent = 'Copied';
+      btn.classList.add('is-copied');
+      setTimeout(function () {
+        btn.textContent = orig;
+        btn.classList.remove('is-copied');
+      }, 1500);
+    });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const idToLink = {};
+  tocLinks.forEach(function (a) {
+    const href = a.getAttribute('href');
+    if (href && href.charAt(0) === '#') idToLink[href.slice(1)] = a;
+  });
+  const headings = document.querySelectorAll('.article-body > h2, .article-body h3, .glossary-section h2');
+  if ('IntersectionObserver' in window && headings.length) {
+    let active = null;
+    const visible = new Set();
+    const obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) visible.add(e.target.id);
+        else visible.delete(e.target.id);
+      });
+      let earliest = null;
+      headings.forEach(function (h) {
+        if (visible.has(h.id) && !earliest) earliest = h.id;
+      });
+      if (!earliest && headings.length) {
+        let nearest = null;
+        headings.forEach(function (h) {
+          const top = h.getBoundingClientRect().top;
+          if (top < 120) nearest = h.id;
+        });
+        earliest = nearest;
+      }
+      if (earliest && earliest !== active) {
+        if (active && idToLink[active]) idToLink[active].classList.remove('is-active');
+        active = earliest;
+        if (idToLink[active]) idToLink[active].classList.add('is-active');
+      }
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    headings.forEach(function (h) { obs.observe(h); });
+  }
+
+  const tocToggle = document.querySelector('.toc-toggle');
+  const tocList = document.querySelector('.toc-list');
+  if (tocToggle && tocList) {
+    tocToggle.addEventListener('click', function () {
+      const open = tocList.classList.toggle('is-open');
+      tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  const navToggle = document.querySelector('.topnav-toggle');
+  const navGroups = document.querySelector('.topnav-groups');
+  if (navToggle && navGroups) {
+    navToggle.addEventListener('click', function () {
+      navGroups.classList.toggle('is-open');
+    });
+  }
+
+  function flash(el) {
+    if (!el) return;
+    el.classList.add('is-flashing');
+    const dd = el.nextElementSibling;
+    if (dd && dd.tagName === 'DD') dd.classList.add('is-flashing');
+    setTimeout(function () {
+      el.classList.remove('is-flashing');
+      if (dd && dd.tagName === 'DD') dd.classList.remove('is-flashing');
+    }, 1500);
+  }
+  document.querySelectorAll('.glossary-link').forEach(function (a) {
+    a.addEventListener('click', function () {
+      const id = a.getAttribute('data-target');
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        setTimeout(function () { flash(target); }, 300);
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
