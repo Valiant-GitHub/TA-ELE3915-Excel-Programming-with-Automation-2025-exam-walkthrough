@@ -1034,7 +1034,7 @@ body {
     </li>
     <li class="toc-l2"><a href="#2c-maxflops-and-totalflops-aggregating-flop-by-year"><span class="toc-marker">04</span><span class="toc-text">2c — MAXFLOPS and TOTALFLOPS, aggregating FLOP by year</span></a>
       <ul class="toc-sublist">
-        <li class="toc-l3"><a href="#the-canonical-lambdas"><span class="toc-text">The canonical LAMBDAs</span></a></li>
+        <li class="toc-l3"><a href="#the-official-lambdas"><span class="toc-text">The official LAMBDAs</span></a></li>
       </ul>
     </li>
     <li class="toc-l2"><a href="#2d-the-fiscal-year-table-and-the-bar-charts"><span class="toc-marker">05</span><span class="toc-text">2d — The fiscal-year table and the bar charts</span></a>
@@ -1054,12 +1054,12 @@ body {
   <main class="article-body">
     <p>Exercise 2 pivots from pure <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> work into charts. It still uses the <code>AIMODEL</code> table from Exercise 1, but now you're plotting three scatter charts (subparts a and b), writing a paragraph or two about what each plot shows, then building two more LAMBDAs (<code>MAXFLOPS</code> and <code>TOTALFLOPS</code>) that aggregate <a class="glossary-link" href="#glossary-flop" data-target="glossary-flop">FLOP</a> by year, and finally charting those and tying them to NVIDIA's revenue. The four subparts form a natural progression: look at the raw data, spot the exponential trend, cut the data by year, then reason about what the trend implies about real-world spending. Written commentary is a first-class deliverable here — there are no special marks for a slick chart if you say nothing about it.</p>
 <h2 id="quick-orientation-to-the-data">Quick orientation to the data</h2>
-<p>The <code>AIMODEL</code> table has eight columns; Exercise 2 uses four of them. <code>Date</code> is each model's release date as a real Excel date value (so <code>YEAR(date)</code> gives the calendar year). <code>FLOP</code> is the training compute in floating-point operations — huge numbers, typically <code>1E+23</code> to <code>1E+26</code>. <code>Tokens</code> is how much text the model was trained on, also huge (<code>1E+12</code> to <code>1E+15</code> for most language models, much bigger for video). <code>Parameters</code> is the model size — usually <code>1E+9</code> to <code>1E+12</code>.</p>
-<p>Two things you already noticed in Exercise 1 will bite you again here. Some rows have blanks for <code>FLOP</code>, <code>Tokens</code>, or <code>Parameters</code> — charts happily plot those as <code>0</code>, which looks like "model with zero FLOPs" and ruins the log axis. Second, every column is a Excel table column, which means <code>AIMODEL[FLOP]</code> refers to exactly those values — you don't need to drag or hardcode ranges.</p>
+<p>The <code>AIMODEL</code> table has eight columns; Exercise 2 uses four of them. <code>Date</code> is each model's release date as a real Excel date value (so <code>YEAR(date)</code> gives the calendar year). <code>FLOP</code> is the training compute in floating-point operations — huge numbers, typically <code>1E+23</code> to <code>5E+26</code>. <code>Tokens</code> is how much text the model was trained on, also huge (most language models sit between <code>1E+12</code> and <code>1E+14</code>, with the rare video model going much higher — Cosmos-1.0-Diffusion-14B Video2World hits <code>9E+15</code>). <code>Parameters</code> is the model size — usually <code>1E+9</code> to <code>1E+12</code>.</p>
+<p>Two things you already noticed in Exercise 1 will bite you again here. Some rows have blanks for <code>FLOP</code>, <code>Tokens</code>, or <code>Parameters</code>. Excel's chart engine skips genuinely blank cells, so they don't break the chart — the rows that <em>do</em> break it are the ones where you accidentally left a <code>0</code> in place of a missing value (the spurious zeros from 1a's <code>IF/0</code> confusion). <code>log(0)</code> is undefined, so a <code>0</code>-valued point silently vanishes on a log axis — the row appears in your data but no dot shows up, which can look like it's plotted at the bottom but actually isn't there at all. Second, every column is an Excel table column, which means <code>AIMODEL[FLOP]</code> refers to exactly those values — you don't need to drag or hardcode ranges.</p>
 <p>Because this is the second report, <a class="glossary-link" href="#glossary-excel-labs" data-target="glossary-excel-labs">Excel Labs</a> gets only a one-line reminder here: you still need it — the two LAMBDAs in 2c (<code>MAXFLOPS</code> and <code>TOTALFLOPS</code>) should be saved there under those names. Lecture 4 introduced the tool, and <code>Solutions.*</code> LAMBDAs inside every lecture exercise file from 4 onward are worked parallels worth opening when something feels unfamiliar.</p>
 <h2 id="2a-scatter-plot-of-flop-vs-date-with-a-log-y-axis">2a — Scatter plot of FLOP vs. date with a log y-axis</h2>
-<p>The exam asks for a <a class="glossary-link" href="#glossary-scatter-plot" data-target="glossary-scatter-plot">scatter plot</a> with release date on the x-axis and FLOP count on the y-axis. FLOP counts span from roughly <code>1E+22</code> to <code>1E+26</code> — three or four orders of magnitude. Plotted on a normal linear y-axis, the largest model's bar is taller than the page and every smaller model hugs the x-axis in an unreadable smear. A <a class="glossary-link" href="#glossary-logarithmic-axis" data-target="glossary-logarithmic-axis">logarithmic axis</a> — one where each tick mark multiplies by 10 instead of adding a constant — compresses that range into a readable plot.</p>
-<div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>If FLOP values range from <code>1E+22</code> to <code>1E+26</code>, what happens to the smaller values when you plot them on a linear y-axis?</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The smaller values (<code>1E+22</code> to <code>1E+24</code>) all collapse into a line along the x-axis that looks like zero. A difference of 100x between a <code>1E+22</code> and <code>1E+24</code> model is real and interesting, but on a linear axis scaled to <code>1E+26</code>, both look like flat zero. Log scale is the fix.</p></div></div><h3 id="click-path-for-the-chart">Click path for the chart</h3>
+<p>The exam asks for a <a class="glossary-link" href="#glossary-scatter-plot" data-target="glossary-scatter-plot">scatter plot</a> with release date on the x-axis and FLOP count on the y-axis. FLOP counts span from roughly <code>1E+23</code> to almost <code>5E+26</code> — three to four orders of magnitude. Plotted on a normal linear y-axis, the largest model towers over the page and every smaller model hugs the x-axis in an unreadable smear. A <a class="glossary-link" href="#glossary-logarithmic-axis" data-target="glossary-logarithmic-axis">logarithmic axis</a> — one where each tick mark multiplies by 10 instead of adding a constant — compresses that range into a readable plot.</p>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>If FLOP values range from <code>1E+23</code> to almost <code>5E+26</code>, what happens to the smaller values when you plot them on a linear y-axis?</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The smaller values (<code>1E+23</code> to <code>1E+24</code>) all collapse into a line along the x-axis that looks like zero. A 10x difference between a <code>1E+23</code> and <code>1E+24</code> model is real and interesting, but on a linear axis scaled to <code>5E+26</code>, both look like flat zero. Log scale is the fix.</p></div></div><h3 id="click-path-for-the-chart">Click path for the chart</h3>
 <ol>
 <li>Select the two columns of interest. Click the <code>Date</code> header of <code>AIMODEL</code>, then Ctrl+click the <code>FLOP</code> header — this selects both columns including the header cells, which Excel uses for axis labels.</li>
 <li>Insert tab → Scatter chart group (it's the one with the dots) → pick the first option, "Scatter" (just dots, no connecting lines). Excel drops a chart into the sheet with <code>Date</code> on the x-axis and <code>FLOP</code> on the y-axis.</li>
@@ -1069,12 +1069,12 @@ body {
 </ol>
 <p>That's it for the load-bearing work. Cosmetic polish — colours, marker size, gridlines, removing the empty <a class="glossary-link" href="#glossary-legend" data-target="glossary-legend">legend</a> — is nice but doesn't earn marks. The load-bearing bits are the chart type (scatter, not line), the <a class="glossary-link" href="#glossary-axis-type" data-target="glossary-axis-type">axis type</a> (log, base 10, on FLOP), and which column is which.</p>
 <h3 id="what-you-should-see">What you should see</h3>
-<p>Dots scatter in a roughly diagonal band from bottom-left (2022 models, <code>1E+22</code> to <code>1E+24</code>) to top-right (2025 models, <code>1E+25</code> to the odd <code>1E+26</code>). On the log axis the band looks roughly linear — a straight-line shape on a log axis means exponential growth in the underlying numbers.</p>
+<p>Dots scatter in a roughly diagonal band from bottom-left (2022 models, <code>1E+23</code> to a few times <code>1E+24</code>) to top-right (2025 models, <code>1E+25</code> to about <code>5E+26</code> for the Grok-3 outlier). On the log axis the band looks roughly linear — a straight-line shape on a log axis means exponential growth in the underlying numbers.</p>
 <h3 id="what-to-write-two-or-three-sentences-is-enough">What to write (two or three sentences is enough)</h3>
 <p>The solution workbook's observation is a good model to paraphrase: <em>"The maximal FLOP increases linearly on the log-axis. This means there is an exponential trend in the maximal FLOPS used. Moreover, all FLOPs are at least roughly <code>1E+23</code>, and there are plenty of models with such small FLOPS each year. The data set evidently contains both very large models such as Grok-3 but also smaller models with fewer FLOPS used during training."</em> The points to make, in your own words: the trend is exponential (straight-line-ish on log), there's a floor somewhere around <code>1E+23</code>, and each year contains a wide spread of models — not just frontier ones.</p>
 <p>Common mistake: confusing a scatter plot with a line chart. Line charts assume the x-axis is a categorical sequence (1, 2, 3, ...) — if you hand one a date column, it will compress or reorder weirdly. Scatter treats dates as real numeric positions on the axis.</p>
 <p>Second common mistake: forgetting the log step and writing commentary about a linear plot where everything looks like zero. If your plot is readable only for the top few models, the log checkbox is what you missed.</p>
-<p><strong>Lecture tie-in.</strong> Scatter plots and axis types are introduced in <code>03lecturefilled.xlsx</code> (the general chart-construction material in Part I). For deeper treatment of log scales, scales and axis types, the Part II charts deck <code>02Charts.pdf</code> has the direct slide on log scales — it's not technically your half of the course, but the one slide is worth a look if the idea feels new.</p>
+<p><strong>Lecture tie-in.</strong> Charts are covered in Part 2 of the course (Adam Lee's half — PivotTables, Charts, Programming, TypeScript, ExcelScripts). The direct lecture reference is <code>02Charts.pdf</code> and its companion workbook <code>02Charts.xlsx</code>. For scatter plots with log y-axes specifically, sheet "2-AxesScales" has the worked examples; sheet "1-BadCharts" shows what goes wrong without log scaling. Part 1 of the course (Jonas Moss's LAMBDA lectures 01-07 lecturefilled.xlsx) doesn't cover charts directly.</p>
 <h2 id="2b-the-same-idea-twice-tokens-vs-date-and-parameters-vs-date">2b — The same idea, twice: tokens vs. date and parameters vs. date</h2>
 <p>This is mechanical repetition with two different y-columns. Repeat the click path exactly — select <code>Date</code> + <code>Tokens</code>, insert scatter, log the y-axis; then <code>Date</code> + <code>Parameters</code>, insert scatter, log the y-axis. You end up with three scatter plots total (2a's FLOP plot, plus tokens and parameters).</p>
 <h3 id="what-you-should-see-2">What you should see</h3>
@@ -1083,8 +1083,8 @@ body {
 <h3 id="what-to-write">What to write</h3>
 <p>The solution's commentary is short and to the point: <em>"The number of tokens increase roughly linearly by date on the log-axis, but there are some outliers, especially the model with token count of ~1.00E16, which is Cosmos-1.0-Diffusion-14B Video2World. Perhaps video models use more tokens than text models? The number of parameters used is relatively constant compared to FLOPs, but with some weaker outliers."</em> Again, paraphrase this rather than copy. The substance is: tokens grow-ish with a noisy outlier that is worth naming, and parameters are more stable than you might have expected.</p>
 <p>Partial-credit alternative: if three separate scatter plots feel like a lot of clicking, you can combine <code>FLOP</code>, <code>Tokens</code>, <code>Parameters</code> into one scatter plot with three data series. Right-click the chart → Select Data → Add each column as a series against <code>Date</code>. It's less readable but earns most of the marks because the axes and trends are all visible. Just make sure the log scale still applies — each series shares the y-axis.</p>
-<p>Common mistake: letting blank <code>Tokens</code> / <code>Parameters</code> cells pull the chart down. Because blanks get treated as <code>0</code>, and the axis is logarithmic, those points vanish (<code>log(0)</code> is undefined — Excel just skips them). That's actually fine for this subpart. But if you copy the data to a scratch area first and replace blanks with zeros, then plot, you get the same behaviour for a different reason. Either way you don't need to filter the data before charting.</p>
-<p><strong>Lecture tie-in.</strong> Same as 2a — <code>03lecturefilled.xlsx</code> for chart construction, <code>02Charts.pdf</code> for the log-scale slide. No new territory here.</p>
+<p>Common mistake: worrying about blank <code>Tokens</code> / <code>Parameters</code> cells. Excel's chart engine skips blank entries entirely — they're not plotted at all. (If you'd replaced the blanks with <code>0</code> first and then tried to chart on a log axis, <code>log(0)</code> is undefined and those points silently vanish — different mechanism from blanks but the same end result, no dot in the plot.) For this subpart, leave the blanks as blanks and don't filter the data before charting.</p>
+<p><strong>Lecture tie-in.</strong> Same as 2a — no new territory here.</p>
 <h2 id="2c-maxflops-and-totalflops-aggregating-flop-by-year">2c — <code>MAXFLOPS</code> and <code>TOTALFLOPS</code>, aggregating FLOP by year</h2>
 <p>Now the gears shift back to LAMBDAs. Define two functions:</p>
 <ul>
@@ -1092,7 +1092,7 @@ body {
 <li><code>TOTALFLOPS(year)</code> — the sum of all FLOP counts across models released that calendar year.</li>
 </ul>
 <p>Both share the same core pattern: build a boolean mask that says "this row's year matches the argument", apply it to the FLOP column, aggregate.</p>
-<h3 id="the-canonical-lambdas">The canonical LAMBDAs</h3>
+<h3 id="the-official-lambdas">The official LAMBDAs</h3>
 <div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">MAXFLOPS = LAMBDA(year,
     LET(
         flops, AIMODEL[FLOP],
@@ -1128,97 +1128,119 @@ TOTALFLOPS = LAMBDA(year,
 <thead>
 <tr>
 <th>Fiscal year</th>
-<th>Calendar year for MAXFLOPS / TOTALFLOPS</th>
+<th>Calendar year covered</th>
+<th>MAX FLOPS</th>
+<th>TOTAL FLOPS</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>FY2021</td>
-<td><code>MAXFLOPS(2020)</code> / <code>TOTALFLOPS(2020)</code></td>
+<td>CY2020</td>
+<td><code>MAXFLOPS(2020)</code></td>
+<td><code>TOTALFLOPS(2020)</code></td>
 </tr>
 <tr>
 <td>FY2022</td>
-<td><code>MAXFLOPS(2021)</code> / <code>TOTALFLOPS(2021)</code></td>
+<td>CY2021</td>
+<td><code>MAXFLOPS(2021)</code></td>
+<td><code>TOTALFLOPS(2021)</code></td>
 </tr>
 <tr>
 <td>FY2023</td>
-<td><code>MAXFLOPS(2022)</code> / <code>TOTALFLOPS(2022)</code></td>
+<td>CY2022</td>
+<td><code>MAXFLOPS(2022)</code></td>
+<td><code>TOTALFLOPS(2022)</code></td>
 </tr>
 <tr>
 <td>FY2024</td>
-<td><code>MAXFLOPS(2023)</code> / <code>TOTALFLOPS(2023)</code></td>
+<td>CY2023</td>
+<td><code>MAXFLOPS(2023)</code></td>
+<td><code>TOTALFLOPS(2023)</code></td>
 </tr>
 <tr>
 <td>FY2025</td>
-<td><code>MAXFLOPS(2024)</code> / <code>TOTALFLOPS(2024)</code></td>
+<td>CY2024</td>
+<td><code>MAXFLOPS(2024)</code></td>
+<td><code>TOTALFLOPS(2024)</code></td>
 </tr>
 <tr>
 <td>FY2026</td>
-<td><code>MAXFLOPS(2025)</code> / <code>TOTALFLOPS(2025)</code></td>
+<td>CY2025</td>
+<td><code>MAXFLOPS(2025)</code></td>
+<td><code>TOTALFLOPS(2025)</code></td>
 </tr>
 </tbody>
 </table>
 <p>If your numbers disagree with the solution workbook by one year, the fiscal-year shift is almost always the culprit.</p>
-<p>A couple of the seed cells are pre-filled in the exam sheet to help you check yourself: <code>C37 = 3.14E+23</code> (MAX in FY2021) and <code>D39 = 1.03E+25</code> (TOTAL in FY2023). Match those and you know your fiscal-year shift is correct.</p>
+<p>A couple of the seed cells are pre-filled in the exam sheet to help you check yourself: <code>C38 = 3.14E+23</code> (MAX in FY2021) and <code>D40 = 1.03E+25</code> (TOTAL in FY2023). Match those and you know your fiscal-year shift is correct.</p>
 <h3 id="building-the-bar-charts">Building the bar charts</h3>
 <ol>
-<li>Select <code>B37:C43</code> (fiscal year + Max FLOPS column). Insert → Column/<a class="glossary-link" href="#glossary-bar-chart" data-target="glossary-bar-chart">Bar Chart</a> → Clustered Column. Give it a title like "Max FLOPs by fiscal year". If the bars are all visually flat except the last, apply log scale to the y-axis (right-click axis → Format Axis → Logarithmic). The exam asks for bar charts specifically — log scale isn't required but makes the exponential trend visible.</li>
-<li>Repeat for <code>B37:B43</code> + <code>D37:D43</code> (fiscal year + Total FLOPS column), titled "Total FLOPs by fiscal year".</li>
+<li>Select <code>B37:C43</code> (the header row at row 37 plus the six fiscal-year rows in rows 38 through 43, covering FY2021 through FY2026 with their <code>Max FLOPS</code> values). Insert → Column/<a class="glossary-link" href="#glossary-bar-chart" data-target="glossary-bar-chart">Bar Chart</a> → Clustered Column. Give it a title like "Max FLOPs by fiscal year". If the bars are all visually flat except the last, apply log scale to the y-axis (right-click axis → Format Axis → Logarithmic). The exam asks for bar charts specifically — log scale isn't required but makes the exponential trend visible.</li>
+<li>Repeat for the Total FLOPS chart: select <code>B37:B43</code> then Ctrl+select <code>D37:D43</code> (two non-contiguous ranges — the year column and the Total FLOPS column, both with their headers). Insert → Clustered Column, title it "Total FLOPs by fiscal year".</li>
 </ol>
 <h3 id="what-to-write-2">What to write</h3>
 <p>This subpart has two commentary pieces: which metric tracks NVIDIA revenue better, and what the 2026 value tells you.</p>
-<div class="reveal-block"><div class="reveal-question"><p><strong>Pause.</strong>Between the MAX FLOP and the TOTAL FLOP each year, which do you expect to track NVIDIA revenue more closely, and why? Take a minute before reading on.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden><p>The honest answer is <strong>both are close, and the total is slightly cleaner</strong>. NVIDIA's revenue scales with how many chips get sold, and chips get sold in proportion to how much total training compute the industry is running — that's <code>TOTALFLOPS</code>. <code>MAXFLOPS</code> captures only the frontier model, which is one customer's order, not the whole market. You'd expect the total to correlate more tightly with NVIDIA's revenue. The solution workbook backs this up with actual numbers: <code>TOTALFLOPS</code> and revenue both roughly 10x and 2x in step from 2023 onward.</p>
-<p>The NVIDIA revenue table, cleaned:</p>
+<div class="reveal-block"><div class="reveal-question"><p><strong>Pause.</strong>Between the MAX FLOP and the TOTAL FLOP each year, which do you expect to track NVIDIA revenue more closely, and why? Take a minute before reading on.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden><p>The honest answer is <strong>both are close, and the total is slightly cleaner</strong>. NVIDIA's revenue scales with how many chips get sold, and chips get sold in proportion to how much total training compute the industry is running — that's <code>TOTALFLOPS</code>. <code>MAXFLOPS</code> captures only the frontier model, which is one customer's order, not the whole market. You'd expect the total to correlate more tightly with NVIDIA's revenue. The solution workbook backs this up: from FY2023 to FY2025, <code>TOTALFLOPS</code> jumps about 14× then about 3× year-over-year (uneven, but always upward), while NVIDIA revenue grows about 2× per year over the same window. Compute is growing faster than revenue, but they move together.</p>
+<p>The NVIDIA revenue table, cleaned (the exam wording lists revenue for FY2022 through FY2025 only — FY2021 and FY2026 are not provided):</p>
 <table>
 <thead>
 <tr>
-<th>Fiscal year</th>
-<th>Revenue ($B)</th>
+<th>NVIDIA fiscal year</th>
+<th>Revenue (USD billions)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>2022</td>
-<td>26.9</td>
+<td>FY2021</td>
+<td>not provided</td>
 </tr>
 <tr>
-<td>2023</td>
-<td>27.0</td>
+<td>FY2022</td>
+<td>26.914</td>
 </tr>
 <tr>
-<td>2024</td>
-<td>60.9</td>
+<td>FY2023</td>
+<td>26.974</td>
 </tr>
 <tr>
-<td>2025</td>
-<td>130.5</td>
+<td>FY2024</td>
+<td>60.922</td>
+</tr>
+<tr>
+<td>FY2025</td>
+<td>130.497</td>
+</tr>
+<tr>
+<td>FY2026</td>
+<td>not provided</td>
 </tr>
 </tbody>
 </table></div></div>
-<p>Revenue roughly doubles from FY2024 to FY2025 and was flat before that. <code>TOTALFLOPS</code> grows by roughly 10x per year in the same window, which is faster than revenue — but remember, revenue is priced in dollars, and compute efficiency (FLOP per dollar) has been improving too, so doubling revenue while training compute 10x's is consistent.</p>
+<p>Revenue is essentially flat from FY2022 to FY2023, then roughly doubles year-on-year from FY2023 onward (FY2023 → FY2024 is about 2.3×, FY2024 → FY2025 about 2.1×). <code>TOTALFLOPS</code> grew faster — about 14× from FY2023 to FY2024, then about 3× from FY2024 to FY2025 — which is much steeper than revenue's roughly 2× per year. That gap is consistent with compute efficiency (FLOP per dollar) improving on the chip side, so dollars-of-revenue can double while the training compute they enable multiplies several times.</p>
 <h3 id="interpreting-the-2026-value">Interpreting the 2026 value</h3>
-<p>The FY2026 row maps to calendar 2025 (our current year). <code>TOTALFLOPS(2025)</code> sums FLOPs for all models released in 2025 that are in the dataset. Because the dataset has a cutoff, 2025 is partial — models released late in the year aren't in there yet. Your 2026 number is a lower bound on the full-year total.</p>
-<p>The canonical observation to paraphrase: <em>"The value for 2026 corresponds to this year, i.e., 2025. This year is not finished yet, so we would expect total FLOPs and perhaps max FLOPs to increase. The last couple of years total/max FLOPs have increased roughly linearly on the log scale, so we may expect the total FLOPs to increase by much throughout the year — to perhaps 10x last year."</em> The chain of reasoning you want in your write-up: the value is already large, 2025 is incomplete, extrapolating the exponential trend suggests another 10x is plausible, and somebody has to pay for that compute — NVIDIA is the main seller of the chips that run it, so NVIDIA revenue likely roughly doubles again.</p>
+<p>The FY2026 row maps to calendar 2025, which is the year the dataset cuts off in. <code>TOTALFLOPS(2025)</code> sums FLOPs for all models released in 2025 that made it into the dataset. Because the cutoff is partway through the year, 2025 is incomplete — models released after the cutoff aren't in there. Your 2026 number is a lower bound on the full-year total.</p>
+<p>The official observation to paraphrase: <em>"The value for 2026 corresponds to this year, i.e., 2025. This year is not finished yet, so we would expect total FLOPs and perhaps max FLOPs to increase. The last couple of years total/max FLOPs have increased roughly linearly on the log scale, so we may expect the total FLOPs to increase by much throughout the year — to perhaps 10x last year."</em> The chain of reasoning you want in your write-up: the value is already large, 2025 is incomplete, extrapolating the exponential trend suggests another 10x is plausible, and somebody has to pay for that compute — NVIDIA is the main seller of the chips that run it, so NVIDIA revenue likely roughly doubles again.</p>
 <p>Partial-credit alternative: if you can't get <code>MAXFLOPS</code> and <code>TOTALFLOPS</code> to work as LAMBDAs, you can compute the per-year max and total with <code>MAXIFS</code> and <code>SUMIFS</code> — two built-ins that do exactly filter-then-aggregate. For example:</p>
 <div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">= MAXIFS(AIMODEL[FLOP],
          AIMODEL[Date], &quot;&gt;=2024-01-01&quot;,
          AIMODEL[Date], &quot;&lt;=2024-12-31&quot;)
 </code></pre></div>
 <p>and similarly <code>SUMIFS</code> for the total. You lose the "parameterise by year" convenience, but the table numbers will match. The exam wants named LAMBDAs for full marks, but this still earns partial credit.</p>
-<p><strong>Lecture tie-in.</strong> The <code>LET</code>-with-locals + <code>FILTER</code> construction in <code>MAXFLOPS</code> / <code>TOTALFLOPS</code> is the direct image of <code>06lecturefilled.xlsx</code> sheet "Simplify functions with LET" — that's exactly the pedagogical purpose of the LAMBDAs defined there (things like <code>AVERAGEN</code>, <code>MEDIANN</code>, <code>PRODUCTNEW</code>). For the bar chart construction, <code>03lecturefilled.xlsx</code> has chart material; <code>02Charts.pdf</code> has a clean slide on bar / column charts if you want a visual refresher. For the year-masking idea, <code>03lecturefilled.xlsx</code> sheet "6 UNIQUE and FILTER" is your home base.</p>
+<p><strong>Lecture tie-in.</strong> The <code>LET</code>-with-locals + <code>FILTER</code> construction in <code>MAXFLOPS</code> / <code>TOTALFLOPS</code> is the direct image of <code>06lecturefilled.xlsx</code> sheet "Simplify functions with LET" — that's exactly the pedagogical purpose of the LAMBDAs defined there (things like <code>AVERAGEN</code>, <code>MEDIANN</code>, <code>PRODUCTNEW</code>). For the bar chart construction, the Part 2 chart lecture <code>02Charts.pdf</code> is the relevant material; its companion workbook <code>02Charts.xlsx</code> has worked examples on sheets "1-BadCharts", "2-AxesScales", and "4-AmountsProportions". For the year-masking idea, <code>03lecturefilled.xlsx</code> sheet "6 UNIQUE and FILTER" is your home base.</p>
 <h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
-<p>The three scatter plots in 2a and 2b are mostly click-path, so if the result doesn't look right, the commonest cause is forgetting to log-scale the y-axis — right-click axis → Format Axis → Logarithmic. For the log scale idea itself, <code>02Charts.pdf</code> in your course materials has a direct slide. For <code>MAXFLOPS</code> and <code>TOTALFLOPS</code>, the <code>LET</code>-with-<code>FILTER</code> pattern is worked in <code>06lecturefilled.xlsx</code> — open Excel Labs there and read <code>Solutions.AVERAGEN</code>, which sets up locals then wraps an aggregate. If the fiscal-year mapping is where you get stuck, sketch it on paper: NVIDIA FY ends Jan 31, so FYn covers most of calendar year (n-1); check your <code>MAXFLOPS(2021) = 3.14E+23</code> against the exam's pre-filled cell before filling in the rest.</p>
+<p>The three scatter plots in 2a and 2b are mostly click-path, so if the result doesn't look right, the commonest cause is forgetting to log-scale the y-axis — right-click axis → Format Axis → Logarithmic. For <code>MAXFLOPS</code> and <code>TOTALFLOPS</code>, the <code>LET</code>-with-<code>FILTER</code> pattern is worked in <code>06lecturefilled.xlsx</code> — open Excel Labs there and read <code>Solutions.AVERAGEN</code>, which sets up locals then wraps an aggregate. If the fiscal-year mapping is where you get stuck, sketch it on paper: NVIDIA FY ends Jan 31, so FYn covers most of calendar year (n-1); check your <code>MAXFLOPS(2020) = 3.14E+23</code> (which is the FY2021 row, since FY2021 maps to CY2020) against the exam's pre-filled <code>C38</code> before filling in the rest.</p>
     <section class="glossary-section" id="glossary">
 <h2 id="glossary-heading">Glossary</h2>
 <dl class="glossary-list">
-<dt id="glossary-aimodel"><strong>AIMODEL</strong></dt><dd><p>The Excel table on the sheet of the same name in <code>exam_part1.xlsx</code>. Each row is one AI model; the columns used in Exercise 2 are <code>Model</code>, <code>Date</code>, <code>FLOP</code>, <code>Tokens</code>, <code>Parameters</code>.</p></dd>
+<dt id="glossary-aimodel"><strong>AIMODEL</strong></dt><dd><p>The Excel table on the sheet of the same name in <code>exam_part1.xlsx</code>. Each row is one AI model; the columns used by Exercise 2 formulas and charts are <code>Date</code>, <code>FLOP</code>, <code>Tokens</code>, <code>Parameters</code>. (<code>Model</code> shows up in the written commentary about outliers — Cosmos, Grok-3 — but isn't referenced by any formula.)</p></dd>
 <dt id="glossary-axis-type"><strong>Axis type</strong></dt><dd><p>Charts have two axes (x and y) and each has a type. For scatter plots both are value axes; for bar charts the x-axis is typically a category axis. The <em>scale</em> of a value axis can be linear or logarithmic.</p></dd>
 <dt id="glossary-bar-chart"><strong>Bar chart</strong></dt><dd><p>A chart type where each category gets a rectangular bar whose length encodes a value. In Excel, "Clustered Column" is the vertical variant; "Bar" is the horizontal variant. Used in 2d for the fiscal-year totals.</p></dd>
 <dt id="glossary-category-axis"><strong>Category axis</strong></dt><dd><p>An axis where positions are labels rather than numeric values. A bar chart's x-axis is typically categorical.</p></dd>
 <dt id="glossary-dynamic-array"><strong>Dynamic array</strong></dt><dd><p>A formula result that spills into multiple cells. <code>MAXFLOPS</code> and <code>TOTALFLOPS</code> return single values, but the table in 2d uses six calls to them.</p></dd>
 <dt id="glossary-excel-labs"><strong>Excel Labs</strong></dt><dd><p>The Microsoft Research add-in that provides the Advanced Formula Environment where LAMBDAs are saved by name. Lecture 4 introduces it.</p></dd>
 <dt id="glossary-filterarray-keep-condition"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/filter-function" target="_blank" rel="noopener" title="View FILTER on ExcelJet">FILTER</a>(array, keep_condition)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns the rows of <code>array</code> where <code>keep_condition</code> is <code>TRUE</code>. Used in both <code>MAXFLOPS</code> and <code>TOTALFLOPS</code>.</p></dd>
-<dt id="glossary-flop"><strong>FLOP</strong></dt><dd><p>Floating-point operation. A count of arithmetic operations (plus, minus, times, divide on decimal numbers) used to train a model. Values in this exam range from roughly <code>1E+22</code> to <code>5E+26</code>.</p></dd>
+<dt id="glossary-flop"><strong>FLOP</strong></dt><dd><p>Floating-point operation. A count of arithmetic operations (plus, minus, times, divide on decimal numbers) used to train a model. Values in this exam range from roughly <code>1E+23</code> (the smallest model) to almost <code>5E+26</code> (Grok-3).</p></dd>
 <dt id="glossary-fiscal-year"><strong>Fiscal year</strong></dt><dd><p>The 12-month period a company uses for financial reporting. NVIDIA's ends January 31, so fiscal 2025 mostly covers calendar 2024.</p></dd>
 <dt id="glossary-lambda"><strong><a class="exceljet-link" href="https://exceljet.net/functions/lambda-function" target="_blank" rel="noopener" title="View LAMBDA on ExcelJet">LAMBDA</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>A reusable function, defined with <code>LAMBDA(args, body)</code> and saved by name in Excel Labs or Name Manager.</p></dd>
 <dt id="glossary-letname1-val1-final"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/let-function" target="_blank" rel="noopener" title="View LET on ExcelJet">LET</a>(name1, val1, ..., final)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Binds local names to values inside a formula. Doesn't change results; makes formulas readable and avoids re-typing the same range.</p></dd>

@@ -2,6 +2,10 @@
 
 Interactive companion reports for the ELE3915 (Excel Programming & Automation, BI Norwegian Business School) 2025 take-home exam. Self-contained HTML — open any file in a browser, no install, no network, everything renders offline.
 
+## What this is
+
+This is a set of walkthroughs I put together while TA-ing ELE3915 — basically the explanations I'd give in office hours, written down so anyone can follow them on their own. Each report takes one exam question, breaks down what's actually being asked, and walks the official solution one piece at a time. I've flagged the partial-credit shortcuts where they exist (a one-line `XLOOKUP` instead of a `FILTER`-returns-a-row, a manual list instead of a dynamic array — that kind of thing) and pointed back to the exact lecture sheet or worked exercise where each pattern was first taught, so you can go reread the source if something doesn't click. If you've been stuck on one of these problems for half an hour, this is what I'd say to you sitting next to your laptop.
+
 ## Contents
 
 **Landing page**
