@@ -1,6 +1,6 @@
 # ELE3915 — 2025 Take-Home Exam Walkthroughs
 
-Interactive companion reports for the ELE3915 (Excel Programming & Automation, BI Norwegian Business School) 2025 take-home exam. Self-contained HTML — open any file in a browser, no install, no network, everything can render offline. However, I also deployed it with https://wasmer.io/ for free at https://ta-ele-3915-2025-exam-walkthrough.wasmer.app/ making it accessible on any browser and most devices.
+Interactive companion reports for the ELE3915 (Excel Programming & Automation, BI Norwegian Business School) 2025 take-home exam. Self-contained HTML — open any file in a browser, no install, no network, everything can render offline. However, I also deployed it with https://wasmer.io/ for free at https://bi-ta-ele3915-2025-exam-walkthrough.wasmer.app/ making it accessible on any browser and most devices.
 
 WEBSITE: CURRENTLY DOWN DUE TO ISSUES THAT NEED FIXING.
 
