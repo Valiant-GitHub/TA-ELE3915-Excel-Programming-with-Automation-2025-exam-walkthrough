@@ -1201,7 +1201,13 @@ end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 <p>3c: <a class="glossary-link" href="#glossary-scatter-plot" data-target="glossary-scatter-plot">scatter plot</a> with <code>date</code> on the x-axis and <code>score</code> on the y-axis, then a short paragraph on the pattern and its implications.</p>
 <h3 id="click-path">Click path</h3>
 <ol>
-<li>Select the two columns you want. In the <code>MATH</code> table, <code>date</code> is immediately before <code>score</code>, so the easiest path is to select those two adjacent columns with <code>date</code> on the left and <code>score</code> on the right. If Excel ever picks them up in the wrong order, copy them side by side into free cells with <code>date</code> in the left column and <code>score</code> in the right, then select that scratch block.</li>
+<li>Pick <code>date</code> and <code>score</code> and select them with <code>date</code> on the left. (<code>score</code> is actually left of <code>date</code> in the starter — see below for the fix.)
+<div class="reveal-block" style="margin-top: 10px;"><div class="reveal-question"><p><strong>But score is left of date in mine — what do I do?</strong></p></div><button class="reveal-btn" data-target="reveal-3" aria-expanded="false">Show the fix</button><div class="reveal-content" id="reveal-3" hidden><p>In the starter, <code>MATH</code> columns go <code>id</code>, <code>model</code>, <code>score</code>, <code>date</code>. That's backwards for a scatter, since Excel uses the leftmost selected column as the x-axis. Two fixes:</p>
+<ol style="list-style-type: lower-alpha;">
+<li><strong>Rearrange the table</strong> so <code>date</code> is left of <code>score</code>. Adam did this in the solutions workbook with a note: <em>"I modified the order of date and score in the table. There are most likely much better ways to do it."</em></li>
+<li><strong>Scratch cells</strong> — copy <code>date</code> and <code>score</code> into two adjacent free cells, chart from that block.</li>
+</ol>
+<p>Either's fine.</p></div></div></li>
 <li>Insert tab → Scatter → first option (dots, no lines).</li>
 <li>The y-axis is a fraction from 0 to 1 — no log scale needed here, and in fact log scale would be actively wrong for a fraction. Leave the y-axis linear.</li>
 <li>The x-axis should be a <a class="glossary-link" href="#glossary-date-axis" data-target="glossary-date-axis">date axis</a>, so Excel lays out points by true date position (not just categorically). Right-click the x-axis → Format Axis → Axis type → Date axis (this is usually selected automatically for scatter plots, but worth confirming).</li>
