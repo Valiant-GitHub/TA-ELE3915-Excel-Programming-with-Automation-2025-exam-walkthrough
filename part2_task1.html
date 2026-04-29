@@ -113,6 +113,15 @@ body {
   gap: 18px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
+  /* Hide-on-scroll-down behavior on narrow screens */
+  .topnav {
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+  .topnav.topnav--hidden {
+    transform: translateY(-110%);
+  }
+
 
 .topnav-home {
   color: var(--cream);
@@ -126,6 +135,26 @@ body {
   border-left: 3px solid var(--seafoam);
   margin-right: 6px;
 }
+.topnav-index {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 12px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--header-font);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.topnav-index:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 
 .topnav-home:hover { color: var(--seafoam); }
 
@@ -983,7 +1012,7 @@ body {
 <div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
 <div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
 <nav class="topnav" aria-label="Primary">
-  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+  <a class="topnav-home" href="https://www.bi.no/" target="_blank" rel="noopener noreferrer" aria-label="BI Norwegian Business School (opens in new tab)"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
 <g clip-path="url(#clip0_9485_462)">
 <rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
 <rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
@@ -1037,6 +1066,7 @@ body {
 </clipPath>
 </defs>
 </svg></span></a>
+  <a class="topnav-index" href="index.html" aria-label="Back to overview">🏠 Home</a>
   <div class="topnav-groups">
     <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
       <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
@@ -1080,13 +1110,13 @@ body {
 </aside>
   <main class="article-body">
     <h2 id="what-this-task-is-really-about">What this task is really about</h2>
-<p>Task 1 is the groundwork for everything that follows. The <code>BIKE</code> table on the <code>Bike</code> sheet has 731 rows of daily bike-share numbers from Washington, DC — one row per day, with three columns that matter to us: <code>casual</code>, <code>registered</code>, and <code>cnt</code> (the total of the two). The exam wants a single user-facing switch — a dropdown on the <code>Questions</code> sheet — that controls which of those three numbers downstream calculations will use. Task 2 and Task 3 both read from what you build here, so if Task 1 is wrong, nothing else works.</p>
+<p>Task 1 is the groundwork for everything that follows. The <code>BIKE</code> table on the <code>Bike</code> sheet has 731 rows of daily bike-share numbers from Washington, DC — one row per day, with three columns that matter to us: <code>casual</code>, <code>registered</code>, and <code>cnt</code> (the total of the two). The exam wants a single user-facing switch; a dropdown on the <code>Questions</code> sheet that controls which of those three numbers downstream calculations will use. Task 2 and Task 3 both read from what you build here, so if Task 1 is wrong, nothing else works.</p>
 <p>The three pieces are: a cell with a dropdown (<code>B12</code> on <code>Questions</code>), a name for that cell (<code>userType</code>), and two new columns on the <code>BIKE</code> table (<code>MonthYear</code> and <code>Users</code>). Nothing clever yet — just wiring.</p>
 <h2 id="how-to-read-the-exam-wording">How to read the exam wording</h2>
-<p>The exam uses a few terms that are easy to misread. A <em>named item</em> (also called a <em>named <a class="glossary-link" href="#glossary-range" data-target="glossary-range">range</a></em>) is a label Excel remembers — after you do the naming, writing <code>userType</code> in a formula is the same as writing <code>Questions!$B$12</code>. It makes formulas readable. <em><a class="glossary-link" href="#glossary-data-validation" data-target="glossary-data-validation">Data validation</a></em> is Excel's way of restricting what someone can type into a cell; the "list" kind of validation is what gives you a dropdown arrow. A <em>table</em> in the Excel sense (capital-T Table) is a range that Excel tracks by name — <code>BIKE</code> in this workbook — and its columns can be referenced by name inside formulas using <code>[@columnName]</code> syntax. Once you've got those three in your head, the task is three sentences long.</p>
+<p>The exam uses a few terms that are easy to misread. A <em>named item</em> (also called a <em>named <a class="glossary-link" href="#glossary-range" data-target="glossary-range">range</a></em>) is a label Excel remembers — after you do the naming, writing <code>userType</code> in a formula is the same as writing <code>Questions!$B$12</code>. It makes formulas readable. <em><a class="glossary-link" href="#glossary-data-validation" data-target="glossary-data-validation">Data validation</a></em> is Excel's way of restricting what someone can type into a cell; the "list" kind of validation is what gives you a dropdown arrow. A <em>table</em> in the Excel sense (capital-T Table) is a range that Excel tracks by name — <code>BIKE</code> in this workbook, and its columns can be referenced by name inside formulas using <code>[@columnName]</code> syntax. Once you've got those three in your head, the task is three sentences long.</p>
 <p>The output you're aiming for: cell <code>B12</code> on <code>Questions</code> has a dropdown with <code>casual</code>, <code>registered</code>, <code>total</code>; it's named <code>userType</code>; and the <code>BIKE</code> table has grown two columns on the right, <code>MonthYear</code> (each cell showing the first of the month matching its row's date) and <code>Users</code> (each cell showing whichever of <code>casual</code>/<code>registered</code>/<code>cnt</code> matches the dropdown).</p>
 <h2 id="the-minimum-viable-click-through-version">The minimum-viable, click-through version</h2>
-<p>READMEFIRST says up to 50% is available without any ExcelScript. For Task 1 the manual version is completely reasonable as a fallback: select <code>B12</code>, go to Data → Data Validation, choose List, type <code>casual, registered, total</code>, click OK. Then with <code>B12</code> still selected, type <code>userType</code> into the Name Box (the little box to the left of the <a class="glossary-link" href="#glossary-formula-bar" data-target="glossary-formula-bar">formula bar</a> — the <em>formula bar</em> is the long box at the top of the sheet that shows the <a class="glossary-link" href="#glossary-active-cell" data-target="glossary-active-cell">active cell</a>'s contents). Then on the <code>Bike</code> sheet, right-click the last column header and insert two new columns, type headers, type the formulas in row 2, and Excel's table will fill them down automatically.</p>
+<p>READMEFIRST says up to 50% is available without any ExcelScript. For Task 1 the manual version is completely reasonable as a fallback: select <code>B12</code>, go to Data → Data Validation, choose List, type <code>casual, registered, total</code>, click OK. Then with <code>B12</code> still selected, type <code>userType</code> into the Name Box (the little box to the left of the <a class="glossary-link" href="#glossary-formula-bar" data-target="glossary-formula-bar">formula bar</a>; the <em>formula bar</em> is the long box at the top of the sheet that shows the <a class="glossary-link" href="#glossary-active-cell" data-target="glossary-active-cell">active cell</a>'s contents). Then on the <code>Bike</code> sheet, right-click the last column header and insert two new columns, type headers, type the formulas in row 2, and Excel's table will fill them down automatically.</p>
 <p>That works. What the script adds is reproducibility — if the marker (or you) opens a fresh copy of the starter, one click puts everything back. That's what the exam is really marking.</p>
 <h2 id="building-the-dropdown-with-a-script">Building the dropdown with a script</h2>
 <p>The official script breaks Task 1 into two helper functions, <code>Q1dataValidation</code> and <code>Q1table</code>, both defined at the top level of the file alongside <code>main</code>. <code>main</code> itself is the entry point Excel looks for when you run the script — it always takes a <code>workbook</code> argument, and inside <code>main</code> the helpers are called in order.</p>
@@ -1108,9 +1138,9 @@ workbook.addNamedItem(&quot;userType&quot;, &quot;=&quot; + cell.getAddress(), &
 </code></pre></div>
 <p><code>Qs.getCell(11, 1)</code> is where the <em><a class="glossary-link" href="#glossary-0-indexed-vs-1-indexed" data-target="glossary-0-indexed-vs-1-indexed">0-indexed vs 1-indexed</a></em> thing bites you the first time. ExcelScript's <code>getCell</code> is 0-indexed: row 11, column 1 means the 12th row and the 2nd column, which is <code>B12</code>. Excel itself uses 1-indexed addresses when you type <code>B12</code> by hand, so there's always this mental step. If you ask for <code>getCell(0, 0)</code> you get <code>A1</code>.</p>
 <p><code>cell.getDataValidation()</code> returns the validation object attached to that cell; <code>setRule</code> pastes your rule onto it — after this line, <code>B12</code> has the dropdown.</p>
-<p><code>workbook.addNamedItem</code> takes three things: the name, a formula string that defines what the name points to, and a comment. <code>cell.getAddress()</code> returns something like <code>Questions!$B$12</code> — the <code>"="</code> in front makes it a valid formula string. After this line <code>userType</code> exists as a workbook-level name, and any formula in any sheet can write <code>userType</code> instead of <code>Questions!$B$12</code>.</p>
+<p><code>workbook.addNamedItem</code> takes three things: the name, a formula string that defines what the name points to, and a comment. <code>cell.getAddress()</code> returns something like <code>Questions!$B$12</code>; the <code>"="</code> in front makes it a valid formula string. After this line <code>userType</code> exists as a workbook-level name, and any formula in any sheet can write <code>userType</code> instead of <code>Questions!$B$12</code>.</p>
 <div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>Given three dropdown options and three table columns, how would you write a formula inside the <code>Users</code> column that picks the right one? Sketch it in pseudocode before reading on.</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The logic is: if <code>userType</code> is <code>"casual"</code>, use the row's <code>casual</code> value; otherwise if <code>userType</code> is <code>"registered"</code>, use the row's <code>registered</code> value; otherwise use <code>cnt</code>, which is the total-user column. In Excel formula form that becomes the nested <code>IF</code> used below.</p>
-<p><em>Methods used: <code>getCell</code>, <code>getDataValidation</code>, <code>setRule</code>, <code>addNamedItem</code>, <code>getAddress</code> — see range.pdf and workbook_worksheet.pdf.</em></p></div></div><h2 id="adding-the-two-columns">Adding the two columns</h2>
+<p><em>Methods used: <code>getCell</code>, <code>getDataValidation</code>, <code>setRule</code>, <code>addNamedItem</code>, <code>getAddress</code>; see range.pdf and workbook_worksheet.pdf.</em></p></div></div><h2 id="adding-the-two-columns">Adding the two columns</h2>
 <p>The second function, <code>Q1table</code>, adds two new columns to the <code>BIKE</code> table. Tables in ExcelScript have an <code>addColumn</code> method — passing <code>-1</code> as the index means "add it at the end", and the third argument is the column header name.</p>
 <div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">let dateCol = bike.addColumn(-1, null, &quot;MonthYear&quot;);
 dateCol.getHeaderRowRange().getOffsetRange(1, 0).setFormula(
@@ -1118,10 +1148,10 @@ dateCol.getHeaderRowRange().getOffsetRange(1, 0).setFormula(
 );
 dateCol.getRangeBetweenHeaderAndTotal().setNumberFormat(&quot;mm/yyyy&quot;);
 </code></pre></div>
-<p>The trick here is that you only write the formula once, in the first data cell, and Excel fills it down the whole table column. You get that first cell by asking for the <em>header row range</em> (the cell containing "MonthYear") and then <code>getOffsetRange(1, 0)</code> — one row down, zero columns across — which is the cell directly under the header. That's the first data row.</p>
-<p>The formula uses three Excel functions you might not have bumped into: <code>DATE(year, month, day)</code> builds a date from three numbers; <code>YEAR(d)</code> and <code>MONTH(d)</code> extract those parts from an existing date. Pinning <code>day</code> to <code>1</code> collapses every day of January 2011 into the same value, which is exactly what Task 2's monthly averaging needs. <code>[@dteday]</code> is the table's way of saying "the <code>dteday</code> cell on this row" — the <code>@</code> means "this row".</p>
+<p>Note: you only write the formula once, in the first data cell, and Excel fills it down the whole table column. You get that first cell by asking for the <em>header row range</em> (the cell containing "MonthYear") and then <code>getOffsetRange(1, 0)</code> — one row down, zero columns across which is the cell directly under the header. That's the first data row.</p>
+<p>The formula uses three Excel functions you might not have bumped into: <code>DATE(year, month, day)</code> builds a date from three numbers; <code>YEAR(d)</code> and <code>MONTH(d)</code> extract those parts from an existing date. Pinning <code>day</code> to <code>1</code> collapses every day of January 2011 into the same value, which is what Task 2's monthly averaging needs. <code>[@dteday]</code> is the table's way of saying "the <code>dteday</code> cell on this row"; the <code>@</code> means "this row".</p>
 <p><code>getRangeBetweenHeaderAndTotal</code> returns the body of the column (everything below the header, above any total row), and <code>setNumberFormat("mm/yyyy")</code> tells Excel to display those date values as "01/2011" rather than "01/01/2011". The underlying value is still a full date; only the <em>display</em> changes. That distinction — <em>value vs format</em> — matters: Task 3's chart will read the value, not the format.</p>
-<p><em>Methods used: <code>addColumn</code>, <code>getHeaderRowRange</code>, <code>getOffsetRange</code>, <code>setFormula</code>, <code>getRangeBetweenHeaderAndTotal</code>, <code>setNumberFormat</code> — see table_chart.pdf and range.pdf.</em></p>
+<p><em>Methods used: <code>addColumn</code>, <code>getHeaderRowRange</code>, <code>getOffsetRange</code>, <code>setFormula</code>, <code>getRangeBetweenHeaderAndTotal</code>, <code>setNumberFormat</code>; see table_chart.pdf and range.pdf.</em></p>
 <p>Now the <code>Users</code> column:</p>
 <div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">let userCol = bike.addColumn(-1, null, &quot;Users&quot;);
 userCol.getHeaderRowRange().getOffsetRange(1, 0).setFormula(
@@ -1130,7 +1160,7 @@ userCol.getHeaderRowRange().getOffsetRange(1, 0).setFormula(
 userCol.getRangeBetweenHeaderAndTotal().setNumberFormat(&quot;General&quot;);
 </code></pre></div>
 <p>This is a <em>nested</em> <code>IF</code>. <code>IF(condition, value_if_true, value_if_false)</code> is Excel's if-statement — when you nest, you put another <code>IF</code> where <code>value_if_false</code> would go. Read it as: if the dropdown says casual, use casual; otherwise if it says registered, use registered; otherwise (i.e. "total") use <code>cnt</code>. Three branches, two <code>IF</code>s — that's the usual nesting pattern.</p>
-<p>Two things go wrong with this formula if you're not careful. First, the strings on the right-hand side of each <code>=</code> must match the dropdown options <em>exactly</em>, including case — <code>"Casual"</code> would silently never fire. Second, the final <code>else</code> branch quietly handles "total" by using <code>cnt</code> (the total column) — there's no explicit <code>IF(userType="total", ...)</code>. If you add a fourth option to the dropdown later, this formula will misbehave, because anything that isn't casual or registered falls through to <code>cnt</code>. Noted, not fixed — the exam only has three options.</p>
+<p>Two things go wrong with this formula if you're not careful. First, the strings on the right-hand side of each <code>=</code> must match the dropdown options <em>exactly</em>, including case — <code>"Casual"</code> would silently never fire. Second, the final <code>else</code> branch quietly handles "total" by using <code>cnt</code> (the total column) — there's no explicit <code>IF(userType="total", ...)</code>. If you add a fourth option to the dropdown later, this formula will misbehave, because anything that isn't casual or registered falls through to <code>cnt</code>. Noted, not fixed; the exam only has three options.</p>
 <p>The outer number format is set to <code>"General"</code> because the column holds plain counts like <code>985</code>, not dates or percentages. If you skipped this the column would inherit the table's default and usually be fine; setting it explicitly just removes one thing that can surprise you.</p>
 <p><em>Methods used: <code>addColumn</code>, <code>setFormula</code>, <code>setNumberFormat</code>.</em></p>
 <h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
@@ -1161,16 +1191,40 @@ userCol.getRangeBetweenHeaderAndTotal().setNumberFormat(&quot;General&quot;);
 (function () {
   const bar = document.querySelector('.progress-bar');
   const indicator = document.querySelector('.progress-indicator');
-  function onScroll() {
+  const topnav = document.querySelector('.topnav');
+  let lastScrollY = 0;
+  let ticking = false;
+  const HIDE_THRESHOLD = 80; /* px from top before we start hiding */
+  const SCROLL_TOLERANCE = 4; /* ignore tiny scroll jitter */
+  function applyScrollEffects() {
     const h = document.documentElement;
     const max = h.scrollHeight - h.clientHeight;
-    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    const y = h.scrollTop;
+    const p = max > 0 ? (y / max) * 100 : 0;
     if (bar) bar.style.width = p + '%';
     if (indicator) indicator.textContent = Math.round(p) + '%';
+    if (topnav) {
+      const delta = y - lastScrollY;
+      if (y < HIDE_THRESHOLD) {
+        topnav.classList.remove('topnav--hidden');
+      } else if (delta > SCROLL_TOLERANCE) {
+        topnav.classList.add('topnav--hidden');
+      } else if (delta < -SCROLL_TOLERANCE) {
+        topnav.classList.remove('topnav--hidden');
+      }
+    }
+    lastScrollY = y;
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(applyScrollEffects);
+      ticking = true;
+    }
   }
   document.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
-  onScroll();
+  applyScrollEffects();
 
   document.querySelectorAll('.reveal-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {

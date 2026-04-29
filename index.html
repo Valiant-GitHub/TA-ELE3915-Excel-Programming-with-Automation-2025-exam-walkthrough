@@ -114,6 +114,15 @@ body {
   gap: 18px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
+  /* Hide-on-scroll-down behavior on narrow screens */
+  .topnav {
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+  .topnav.topnav--hidden {
+    transform: translateY(-110%);
+  }
+
 
 .topnav-home {
   color: var(--cream);
@@ -169,6 +178,26 @@ body {
   font-size: 14px;
   font-family: var(--header-font);
   letter-spacing: 0.02em;
+}
+
+.topnav-index {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 12px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--header-font);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.topnav-index:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .topnav-link {
@@ -994,7 +1023,7 @@ body {
 </head>
 <body>
 <nav class="topnav" aria-label="Primary">
-  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+  <a class="topnav-home" href="https://www.bi.no/" target="_blank" rel="noopener noreferrer" aria-label="BI Norwegian Business School (opens in new tab)"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
 <g clip-path="url(#clip0_9485_462)">
 <rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
 <rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
@@ -1048,6 +1077,7 @@ body {
 </clipPath>
 </defs>
 </svg></span></a>
+  <a class="topnav-index" href="index.html" aria-label="Back to overview">🏠 Home</a>
   <div class="topnav-groups">
     <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
       <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
@@ -1075,6 +1105,35 @@ body {
       navGroups.classList.toggle('is-open');
     });
   }
+})();
+
+(function () {
+  const topnav = document.querySelector('.topnav');
+  if (!topnav) return;
+  let lastScrollY = 0;
+  let ticking = false;
+  const HIDE_THRESHOLD = 80;
+  const SCROLL_TOLERANCE = 4;
+  function applyScrollEffects() {
+    const y = document.documentElement.scrollTop;
+    const delta = y - lastScrollY;
+    if (y < HIDE_THRESHOLD) {
+      topnav.classList.remove('topnav--hidden');
+    } else if (delta > SCROLL_TOLERANCE) {
+      topnav.classList.add('topnav--hidden');
+    } else if (delta < -SCROLL_TOLERANCE) {
+      topnav.classList.remove('topnav--hidden');
+    }
+    lastScrollY = y;
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(applyScrollEffects);
+      ticking = true;
+    }
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
 </body>

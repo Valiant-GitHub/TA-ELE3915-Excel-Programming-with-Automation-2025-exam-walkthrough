@@ -113,6 +113,15 @@ body {
   gap: 18px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
+  /* Hide-on-scroll-down behavior on narrow screens */
+  .topnav {
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+  .topnav.topnav--hidden {
+    transform: translateY(-110%);
+  }
+
 
 .topnav-home {
   color: var(--cream);
@@ -126,6 +135,26 @@ body {
   border-left: 3px solid var(--seafoam);
   margin-right: 6px;
 }
+.topnav-index {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 12px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--header-font);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.topnav-index:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 
 .topnav-home:hover { color: var(--seafoam); }
 
@@ -983,7 +1012,7 @@ body {
 <div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
 <div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
 <nav class="topnav" aria-label="Primary">
-  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+  <a class="topnav-home" href="https://www.bi.no/" target="_blank" rel="noopener noreferrer" aria-label="BI Norwegian Business School (opens in new tab)"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
 <g clip-path="url(#clip0_9485_462)">
 <rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
 <rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
@@ -1037,6 +1066,7 @@ body {
 </clipPath>
 </defs>
 </svg></span></a>
+  <a class="topnav-index" href="index.html" aria-label="Back to overview">🏠 Home</a>
   <div class="topnav-groups">
     <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
       <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
@@ -1086,11 +1116,11 @@ body {
   </ul>
 </aside>
   <main class="article-body">
-    <p>Exercise 3 moves to the second dataset, <code>MATH</code>, which holds benchmark results on <a class="glossary-link" href="#glossary-math" data-target="glossary-math">MATH</a> Level 5 — high-school competition math — for a long list of AI models with their release dates. The three subparts build toward the hardest <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> in the exam: 3a asks you to find the top-performing model in each quarter of a year (or range of years), returning a <a class="glossary-link" href="#glossary-dynamic-array" data-target="glossary-dynamic-array">dynamic array</a> of year / quarter / model / score; 3b asks you to make the year arguments optional so <code>FINDBEST()</code> with no arguments queries the whole dataset; 3c asks you to plot score against date and write a paragraph about what the pattern means. The LAMBDA in 3a is where most students slow down, because it has two things happening at once — a helper function that does the per-quarter work, and an outer function that sweeps over all the years and quarters and assembles the output. Build the helper first, confirm it works on one quarter, and only then wrap it in the outer loop.</p>
+    <p>Exercise 3 moves to the second dataset, <code>MATH</code>, which holds benchmark results on <a class="glossary-link" href="#glossary-math" data-target="glossary-math">MATH</a> Level 5 — high-school competition math — for a long list of AI models with their release dates. The three subparts build toward the hardest <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> in the exam: 3a asks you to find the top-performing model in each quarter of a year (or range of years), returning a <a class="glossary-link" href="#glossary-dynamic-array" data-target="glossary-dynamic-array">dynamic array</a> of year / quarter / model / score; 3b asks you to make the year arguments optional so <code>FINDBEST()</code> with no arguments queries the whole dataset; 3c asks you to plot score against date and write a paragraph about what the pattern means. The LAMBDA in 3a is where most students slow down, because it has two things happening at once; a helper function that does the per-quarter work, and an outer function that sweeps over all the years and quarters and assembles the output. Build the helper first, confirm it works on one quarter, and only then wrap it in the outer loop.</p>
 <h2 id="quick-orientation-to-the-math-table">Quick orientation to the MATH table</h2>
-<p><code>MATH</code> has four columns: <code>id</code>, <code>model</code>, <code>score</code>, <code>date</code>. <code>id</code> is a long string like <code>o1-mini-2024-09-12_high</code>; <code>model</code> is the friendlier name like <code>o1-mini</code>; <code>score</code> is a fraction between 0 and 1 — the proportion of problems solved correctly; <code>date</code> is the release date as an Excel date value. One row per model release. (Solutions has <code>date</code> and <code>score</code> swapped — see note at 3c.) The table spans from mid-2023 (earliest entry is <code>gpt-4-0613</code> from June 2023) through early May 2025, with 95 rows. Several models show up multiple times as they're rerun at different settings (Claude 3.7 Sonnet has entries for 16K, 32K, and 64K thinking budgets, for example) — each gets its own row with its own score.</p>
+<p><code>MATH</code> has four columns: <code>id</code>, <code>model</code>, <code>score</code>, <code>date</code>. <code>id</code> is a long string like <code>o1-mini-2024-09-12_high</code>; <code>model</code> is the friendlier name like <code>o1-mini</code>; <code>score</code> is a fraction between 0 and 1; the proportion of problems solved correctly; <code>date</code> is the release date as an Excel date value. One row per model release. (Solutions has <code>date</code> and <code>score</code> swapped; see note at 3c.) The table spans from mid-2023 (earliest entry is <code>gpt-4-0613</code> from June 2023) through early May 2025, with 95 rows. Several models show up multiple times as they're rerun at different settings (Claude 3.7 Sonnet has entries for 16K, 32K, and 64K thinking budgets, for example); each gets its own row with its own score.</p>
 <p>You'll use every column. <code>date</code> drives the quarter filtering, <code>score</code> is what you aggregate, <code>model</code> is what you report, and <code>id</code> is uninteresting for this exercise.</p>
-<p><a class="glossary-link" href="#glossary-excel-labs" data-target="glossary-excel-labs">Excel Labs</a>: same reminder as before — the LAMBDAs in 3a and 3b live in Excel Labs under the names <code>FINDBEST</code> and <code>FINDBEST_</code>. Lecture 4 introduces the tool; Lecture 6 introduces the LET-and-optional-arguments idiom that 3b relies on.</p>
+<p><a class="glossary-link" href="#glossary-excel-labs" data-target="glossary-excel-labs">Excel Labs</a>: same reminder as before; the LAMBDAs in 3a and 3b live in Excel Labs under the names <code>FINDBEST</code> and <code>FINDBEST_</code>. Lecture 4 introduces the tool; Lecture 6 introduces the LET-and-optional-arguments idiom that 3b relies on.</p>
 <h2 id="the-shape-of-3a-before-any-code">The shape of 3a, before any code</h2>
 <div class="reveal-block"><div class="reveal-question"><p><strong>Try it first.</strong>Given a year and a quarter, how would you find the best-performing model? Write the steps in plain English before looking at the LAMBDA.</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>In words:
 1. Convert the year and quarter into a start date and an end date (so Q1 2024 becomes 2024-01-01 through 2024-03-31).
@@ -1098,7 +1128,7 @@ body {
 3. If the filtered result is empty, return <code>"no data"</code> for both model and score.
 4. Otherwise, find the max <code>score</code> in the window and the <code>model</code> that achieved it.
 5. Return year, quarter, that model name, that score — four values side by side.</p>
-<p>That's the per-quarter work. 3a wraps this with "repeat for every quarter in the year range and stack the results, with a header row on top". The exam's wording deliberately hands you the clue in the <code>EOMONTH</code> hint — that's the function you'll use to compute the end-of-quarter date.</p></div></div><h2 id="building-the-helper-first-findbest">Building the helper first — <code>FINDBEST_</code></h2>
+<p>That's the per-quarter work. 3a wraps this with "repeat for every quarter in the year range and stack the results, with a header row on top". The exam's wording hands you the clue in the <code>EOMONTH</code> hint — that's the function you'll use to compute the end-of-quarter date.</p></div></div><h2 id="building-the-helper-first-findbest">Building the helper first — <code>FINDBEST_</code></h2>
 <p>The official solution splits the work into two named LAMBDAs: <code>FINDBEST_</code> (with a trailing underscore) does the per-quarter work, and <code>FINDBEST</code> wraps it with a sweep over all quarters. The trailing-underscore convention is just a name — it says "this is a helper, normally called from inside <code>FINDBEST</code>, but you can still call it yourself for testing".</p>
 <div class="code-block" data-lang="excel"><span class="code-lang">Excel</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-excel">FINDBEST_ = LAMBDA(year, quarter,
     LET(
@@ -1127,15 +1157,15 @@ body {
 </code></pre></div>
 <p>That is the longest LAMBDA in the exam, so take it in pieces.</p>
 <p><strong>The date boundaries.</strong> <code>DATE(year, month, day)</code> constructs an Excel date value from three integers. <code>DATE(2024, 7, 15)</code> is the date value for July 15, 2024. The expression <code>(quarter - 1) * 3 + 1</code> turns a quarter number into the starting month: Q1 → 1, Q2 → 4, Q3 → 7, Q4 → 10. So <code>start</code> is the first day of the quarter.</p>
-<p><code>EOMONTH(start_date, months_to_add)</code> returns the last day of the month that is <code>months_to_add</code> months away from <code>start_date</code>. <code>EOMONTH("2024-01-01", 2)</code> is <code>"2024-03-31"</code> — start of January plus two months lands in March, and <code>EOMONTH</code> snaps to the last day of that month. So <code>end</code> is the last day of the third month of the quarter — i.e., the end of the quarter. This is exactly what the exam hint pointed you at.</p>
+<p><code>EOMONTH(start_date, months_to_add)</code> returns the last day of the month that is <code>months_to_add</code> months away from <code>start_date</code>. <code>EOMONTH("2024-01-01", 2)</code> is <code>"2024-03-31"</code> — start of January plus two months lands in March, and <code>EOMONTH</code> snaps to the last day of that month. So <code>end</code> is the last day of the third month of the quarter — i.e., the end of the quarter. That's what the hint was getting at.</p>
 <p><strong>The column aliases.</strong> <code>dates</code>, <code>models</code>, <code>scores</code> are just shorthand for the three MATH columns. <code>LET</code> lets you name them once and reuse them.</p>
 <p><strong>The filter.</strong> <code>mask</code> is a boolean column: <code>TRUE</code> on rows whose date falls between <code>start</code> and <code>end</code> inclusive. The <code>(a &gt;= b) * (c &lt;= d)</code> shape is the same boolean-multiplication-as-AND idiom you saw in Exercise 1 (1f, 1g). <code>filtered_scores</code> and <code>filtered_models</code> apply the mask to the <code>score</code> and <code>model</code> columns respectively, and wrap the result in <code>IFERROR(..., NA())</code> for the case where zero rows match — <code>FILTER</code> errors if nothing passes, and <code>IFERROR</code> swaps the error for an <code>#N/A</code> marker.</p>
-<p><strong>The has-data check.</strong> Two conditions wrapped in <code>AND</code>. The real work is done by <code>ISNUMBER(SUM(filtered_scores))</code>: if <code>filtered_scores</code> is <code>#N/A</code> (i.e., <code>IFERROR</code> replaced a no-match <code>FILTER</code> error), then <code>SUM(#N/A)</code> propagates the error, and <code>ISNUMBER(#N/A)</code> is <code>FALSE</code> — so the quarter is correctly flagged as having no data. The <code>COUNTA(filtered_scores) &gt; 0</code> check is mostly defensive — <code>COUNTA</code> counts any non-empty cell, including error cells, so it returns <code>1</code> even when <code>filtered_scores</code> is just a single <code>#N/A</code>. So <code>COUNTA &gt; 0</code> is essentially always <code>TRUE</code> in this design; it doesn't change the outcome but it's a belt-and-braces sanity check that the array isn't somehow empty.</p>
+<p><strong>The has-data check.</strong> Two conditions wrapped in <code>AND</code>. The real work is done by <code>ISNUMBER(SUM(filtered_scores))</code>: if <code>filtered_scores</code> is <code>#N/A</code> (i.e., <code>IFERROR</code> replaced a no-match <code>FILTER</code> error), then <code>SUM(#N/A)</code> propagates the error, and <code>ISNUMBER(#N/A)</code> is <code>FALSE</code>, so the quarter is correctly flagged as having no data. The <code>COUNTA(filtered_scores) &gt; 0</code> check is mostly defensive — <code>COUNTA</code> counts any non-empty cell, including error cells, so it returns <code>1</code> even when <code>filtered_scores</code> is just a single <code>#N/A</code>. So <code>COUNTA &gt; 0</code> is essentially always <code>TRUE</code> in this design; it doesn't change the outcome but it's a belt-and-braces sanity check that the array isn't somehow empty.</p>
 <p><strong>The outputs.</strong> <code>max_score</code> is the best score in the quarter, or <code>#N/A</code> if no data. <code>best_model</code> is the model that achieved it, found with <code>XLOOKUP(lookup_value, lookup_array, return_array)</code> — look up <code>max_score</code> inside <code>filtered_scores</code>, return the matching entry of <code>filtered_models</code>. If there's no data, it becomes <code>"no data"</code>. <code>score_out</code> mirrors the score: real value if data, text <code>"no data"</code> otherwise. The reason <code>score_out</code> and <code>max_score</code> are separate is that <code>max_score</code> has to stay numeric for the <code>XLOOKUP</code>, while the reported score can be text.</p>
 <p><strong>The assembly.</strong> <code>HSTACK(year, quarter, best_model, score_out)</code> places the four outputs in a one-row, four-column block. That's what <code>FINDBEST_(year, quarter)</code> returns: a single row with four cells.</p>
-<p>Save this as <code>FINDBEST_</code> in Excel Labs, then test it: <code>=FINDBEST_(2024, 3)</code> should spill <code>2024 | 3 | o1-mini | 0.8918</code> — the highest score in July–September 2024 belongs to the high-effort <code>o1-mini</code> reasoning model (id <code>o1-mini-2024-09-12_high</code>) released 12 September 2024. If you get <code>"no data"</code> back in both slots, check the quarter mapping — Q3 2024 should map to July–September 2024, not the wrong months.</p>
+<p>Save this as <code>FINDBEST_</code> in Excel Labs, then test it: <code>=FINDBEST_(2024, 3)</code> should spill <code>2024 | 3 | o1-mini | 0.8918</code>; the highest score in July–September 2024 belongs to the high-effort <code>o1-mini</code> reasoning model (id <code>o1-mini-2024-09-12_high</code>) released 12 September 2024. If you get <code>"no data"</code> back in both slots, check the quarter mapping — Q3 2024 should map to July–September 2024, not the wrong months.</p>
 <p>Common mistake: forgetting the <code>-1</code> in <code>(quarter - 1) * 3 + 1</code>. Writing <code>quarter * 3 + 1</code> maps Q1 to 4 (April), not January. Read your <code>DATE(year, ..., 1)</code> back and sanity-check the month.</p>
-<p>Second common mistake: <code>EOMONTH(start, 3)</code> instead of <code>EOMONTH(start, 2)</code>. Adding 3 months from January 1 lands in April — you'd include April in Q1, which is wrong. You want 2 months, so the quarter ends at the last day of March.</p>
+<p>Another easy slip: <code>EOMONTH(start, 3)</code> instead of <code>EOMONTH(start, 2)</code>. Adding 3 months from January 1 lands in April — you'd include April in Q1, which is wrong. You want 2 months, so the quarter ends at the last day of March.</p>
 <p><strong>Lecture tie-in.</strong> <code>LET</code> with many locals is Lecture 6 (<code>06lecturefilled.xlsx</code> sheet "Local variables with LET"). For <code>FILTER</code> with a boolean mask, <code>03lecturefilled.xlsx</code> sheet "6 UNIQUE and FILTER" has the core examples, and <code>Solutions.LARGEFILTERBY</code> in <code>04exercises.xlsx</code> is a worked parallel. For <code>XLOOKUP</code>, see <code>03lecturefilled.xlsx</code> sheet "4 The LOOKUP functions". The <code>AND(COUNTA(...) &gt; 0, ISNUMBER(SUM(...)))</code> has-data pattern isn't explicitly taught in lecture, but it's a direct descendant of the missing-value guards in <code>Solutions.IFBLANK</code> (<code>04exercises.xlsx</code>) — same idea of checking emptiness before using a value.</p>
 <h2 id="wrapping-with-findbest-makearray-over-quarters">Wrapping with <code>FINDBEST</code> — <code>MAKEARRAY</code> over quarters</h2>
 <p>The outer function loops over every quarter in the year range and stacks the results, with a header row on top.</p>
@@ -1179,14 +1209,14 @@ body {
                +------+---------+----------+----------+
 </code></pre></div>
 <p>For each <code>(i, j)</code>, the inner <code>LET</code> does:
-- <code>q_index = i - 1</code> — a zero-based quarter index, running <code>0, 1, 2, ..., n-1</code>.
+- <code>q_index = i - 1</code>; a zero-based quarter index, running <code>0, 1, 2, ..., n-1</code>.
 - <code>year = start + INT(q_index / 4)</code> — integer division of <code>q_index</code> by 4 gives the year offset from <code>start</code>. Quarters 0-3 are year 0, 4-7 are year 1, etc. <code>INT(x)</code> rounds toward negative infinity, which for non-negative integers is just truncation.
 - <code>quarter = MOD(q_index, 4) + 1</code> — modulo 4 plus 1 maps <code>0, 1, 2, 3</code> to <code>1, 2, 3, 4</code>. So the first quarter in each year is Q1, as expected.
-- <code>best = FINDBEST_(year, quarter)</code> — a one-row, four-column result from the helper.
+- <code>best = FINDBEST_(year, quarter)</code>; a one-row, four-column result from the helper.
 - <code>INDEX(best, j)</code> — pick out column <code>j</code> of the helper's result. <code>j = 1</code> is year, <code>j = 2</code> is quarter, <code>j = 3</code> is model, <code>j = 4</code> is score.</p>
 <p><code>MAKEARRAY</code> repeats that per-cell LAMBDA <code>n * 4</code> times and assembles an <code>n</code>-by-4 block. For <code>start = 2023</code>, <code>end_ = 2025</code>, you get 12 rows × 4 columns.</p>
-<p><strong>The header.</strong> <code>VSTACK(a, b, ...)</code> stacks arrays vertically; <code>VSTACK({"Year","Quarter","Model","Score"}, results)</code> puts a one-row header on top of the 12-row body. The <code>{...}</code> literal is Excel's array-literal syntax — comma separates columns inside a row, semicolon separates rows. A one-row four-column literal is exactly the header you want.</p>
-<p>Save this as <code>FINDBEST</code> in Excel Labs. Then <code>=FINDBEST(2023)</code> — a call with only the first argument — spills a 13-row, 4-column block: a header plus all 12 quarters from Q1 2023 through Q4 2025. That happens because <code>end_year</code> is omitted and <code>ISOMITTED</code> defaults it to <code>MAX(years) = 2025</code> (the latest year in the MATH dataset), so the function covers three years rather than just one. The first five rows match the exam's expected example output for <code>FINDBEST(2023)</code>:</p>
+<p><strong>The header.</strong> <code>VSTACK(a, b, ...)</code> stacks arrays vertically; <code>VSTACK({"Year","Quarter","Model","Score"}, results)</code> puts a one-row header on top of the 12-row body. The <code>{...}</code> literal is Excel's array-literal syntax — comma separates columns inside a row, semicolon separates rows. That's the header row you want.</p>
+<p>Save this as <code>FINDBEST</code> in Excel Labs. Then <code>=FINDBEST(2023)</code>; a call with only the first argument — spills a 13-row, 4-column block: a header plus all 12 quarters from Q1 2023 through Q4 2025. That happens because <code>end_year</code> is omitted and <code>ISOMITTED</code> defaults it to <code>MAX(years) = 2025</code> (the latest year in the MATH dataset), so the function covers three years rather than just one. The first five rows match the exam's expected example output for <code>FINDBEST(2023)</code>:</p>
 <div class="code-block"><button class="copy-btn" type="button">Copy</button><pre><code>Year  Quarter  Model     Score
 2023  1        no data   no data
 2023  2        GPT-4     0.230
@@ -1194,10 +1224,10 @@ body {
 2023  4        GPT-4     0.400
 </code></pre></div>
 <p>Those numbers are in the exam spec — use them as your sanity check for the 2023 portion of the output. Rows 6–13 carry on through 2024 and 2025; the exam example only shows 2023 because part (a) of the question imagines a simpler version of the function that returned just the year you asked for. The official (b) version with <code>ISOMITTED</code> does more, and that's the version saved in the solution workbook.</p>
-<p>One efficiency note people sometimes raise: every <code>MAKEARRAY</code> cell calls <code>FINDBEST_(year, quarter)</code> and picks out one column with <code>INDEX</code>. That means <code>FINDBEST_</code> gets called four times for the same <code>(year, quarter)</code> — once for each column — when it really only needs to be called once. That's the only technical wart in the official solution. Rewriting it to call the helper once per quarter would speed things up, but the exam doesn't penalise you for the direct-translation approach; it's a recognised trade-off.</p>
-<p>Common mistake: mixing up <code>INT(q_index / 4)</code> with <code>q_index / 4</code>. The latter gives you <code>0, 0.25, 0.5, 0.75, 1, 1.25, ...</code> — a float series — and <code>start + 0.25</code> isn't a valid year. <code>INT</code> (or <code>FLOOR</code>) is the floor toward zero you need.</p>
+<p>One efficiency note people sometimes raise: every <code>MAKEARRAY</code> cell calls <code>FINDBEST_(year, quarter)</code> and picks out one column with <code>INDEX</code>. That means <code>FINDBEST_</code> gets called four times for the same <code>(year, quarter)</code>; once for each column — when it really only needs to be called once. That's the only technical wart in the official solution. Rewriting it to call the helper once per quarter would speed things up, but the exam doesn't penalise you for the direct-translation approach; it's a recognised trade-off.</p>
+<p>One thing that trips people up: mixing up <code>INT(q_index / 4)</code> with <code>q_index / 4</code>. The latter gives you <code>0, 0.25, 0.5, 0.75, 1, 1.25, ...</code>; a float series, and <code>start + 0.25</code> isn't a valid year. <code>INT</code> (or <code>FLOOR</code>) is the floor toward zero you need.</p>
 <p>Second common mistake: hardcoding years in the <code>MAKEARRAY</code> loop, e.g., <code>year = 2023 + INT(q_index / 4)</code>. Do that and <code>FINDBEST(2024, 2025)</code> still starts in 2023. Keep the loop driven by <code>start</code>.</p>
-<p><strong>Lecture tie-in.</strong> <code>MAKEARRAY</code> is introduced in <code>05lecturefilled.xlsx</code> sheet "BYROW, BYCOL, and MAKEARRAY" — open that sheet and read the worked examples carefully. The LAMBDA-inside-LAMBDA nesting you see in <code>MAKEARRAY(n, 4, LAMBDA(i, j, ...))</code> is the defining shape of <code>MAKEARRAY</code>, so if the outer <code>LAMBDA(i, j, ...)</code> looks weird, that's the sheet to re-read. For <code>VSTACK</code> and array literals, same lecture's sheet "HSTACK and VSTACK". For the <code>LET</code> scaffolding, <code>06lecturefilled.xlsx</code> sheet "Local variables with LET" — open <code>Solutions.AVERAGEN</code> and <code>Solutions.FOOBAR</code> to see the same name-then-use rhythm.</p>
+<p><strong>Lecture parallel.</strong> <code>MAKEARRAY</code> is introduced in <code>05lecturefilled.xlsx</code> sheet "BYROW, BYCOL, and MAKEARRAY". Open that sheet and read the worked examples carefully. The LAMBDA-inside-LAMBDA nesting you see in <code>MAKEARRAY(n, 4, LAMBDA(i, j, ...))</code> is the defining shape of <code>MAKEARRAY</code>, so if the outer <code>LAMBDA(i, j, ...)</code> looks weird, that's the sheet to re-read. For <code>VSTACK</code> and array literals, same lecture's sheet "HSTACK and VSTACK". For the <code>LET</code> scaffolding, <code>06lecturefilled.xlsx</code> sheet "Local variables with LET". Open <code>Solutions.AVERAGEN</code> and <code>Solutions.FOOBAR</code> to see the same name-then-use rhythm.</p>
 <h2 id="3b-optional-arguments-with-isomitted">3b — Optional arguments with <code>ISOMITTED</code></h2>
 <p>3b is a small but important modification: <code>FINDBEST</code> should work with no arguments. <code>FINDBEST()</code> must return the same result as <code>FINDBEST(smallest_year_in_data, largest_year_in_data)</code>.</p>
 <div class="reveal-block"><div class="reveal-question"><p><strong>Predict.</strong>How would you make both arguments optional so that calling <code>FINDBEST()</code> still works? Write the idea in plain English before reading on.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden><p>The idea is: inside the function, check whether each argument was supplied; if not, fill it in with a default computed from the data. <code>ISOMITTED(arg)</code> is the function that lets you do this — it returns <code>TRUE</code> when the LAMBDA was called without <code>arg</code>, <code>FALSE</code> otherwise. You can only call <code>ISOMITTED</code> on arguments that were declared as optional in the <code>LAMBDA</code> header, which you mark by enclosing them in square brackets when defining the LAMBDA in Excel Labs. The official definition already has the optional markers — you can see them in the <code>_xlop.start_year, _xlop.end_year</code> prefixes inside the workbook definition.</p>
@@ -1207,16 +1237,16 @@ start, IF(ISOMITTED(start_year), MIN(years), start_year),
 end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 </code></pre></div></div></div>
 <p><code>years</code> is the column of years across the whole dataset. <code>MIN(years)</code> is the earliest year present; <code>MAX(years)</code> is the latest. If the caller supplied <code>start_year</code>, use it; if not, fall back to <code>MIN(years)</code>. Same for <code>end_year</code> with <code>MAX</code>.</p>
-<p>The exam is explicit that you must not hardcode 2023 and 2025 here — that would break if the dataset gets updated. Querying the data for its own extremes is the right shape.</p>
+<p>The exam is explicit that you must not hardcode 2023 and 2025 here that would break if the dataset gets updated. Querying the data for its own extremes is the right shape.</p>
 <p>Save this as your updated <code>FINDBEST</code>. Now <code>=FINDBEST()</code> with no arguments spills the whole dataset's worth of quarters, and the sanity check is that <code>=FINDBEST()</code> equals <code>=FINDBEST(2023, 2025)</code> (the exam says so directly).</p>
-<p>Common mistake: forgetting the square brackets around the optional arguments. If the LAMBDA header says <code>LAMBDA(start_year, end_year, ...)</code> (no brackets), Excel rejects the call as having missing arguments before <code>ISOMITTED</code> ever runs — <code>ISOMITTED</code> only works when the parameters are declared optional with brackets. The definition must be <code>LAMBDA([start_year], [end_year], ...)</code> — bracketed names are optional.</p>
+<p>Easy to get wrong: forgetting the square brackets around the optional arguments. If the LAMBDA header says <code>LAMBDA(start_year, end_year, ...)</code> (no brackets), Excel rejects the call as having missing arguments before <code>ISOMITTED</code> ever runs — <code>ISOMITTED</code> only works when the parameters are declared optional with brackets. The definition must be <code>LAMBDA([start_year], [end_year], ...)</code> — bracketed names are optional.</p>
 <p>Second common mistake: defaulting only one argument. <code>FINDBEST(2024)</code> should give 2024 to 2025 (the default end year), and <code>FINDBEST()</code> should give 2023 to 2025. You need both <code>IF(ISOMITTED(...), ...)</code> lines.</p>
-<p><strong>Lecture tie-in.</strong> <code>ISOMITTED</code> and optional LAMBDA arguments are introduced in <code>06lecturefilled.xlsx</code> sheet "Optional arguments" — that is the direct lecture for this subpart. Read <code>Solutions.FOOBAR</code> in that file's Excel Labs; it's a three-argument LAMBDA with two optional arguments defaulted via exactly this pattern. For a more substantial worked parallel, read <code>Solutions.AVERAGEN</code> in the same file — it takes an optional <code>largest</code> flag with a <code>TRUE</code> default, same idiom.</p>
+<p><strong>From the lectures.</strong> <code>ISOMITTED</code> and optional LAMBDA arguments are introduced in <code>06lecturefilled.xlsx</code> sheet "Optional arguments" that is the direct lecture for this subpart. Read <code>Solutions.FOOBAR</code> in that file's Excel Labs; it's a three-argument LAMBDA with two optional arguments defaulted via exactly this pattern. For a longer worked example, read <code>Solutions.AVERAGEN</code> in the same file — it takes an optional <code>largest</code> flag with a <code>TRUE</code> default, same idiom.</p>
 <h2 id="3c-plot-score-against-date-and-write-about-the-trend">3c — Plot score against date, and write about the trend</h2>
 <p>3c: <a class="glossary-link" href="#glossary-scatter-plot" data-target="glossary-scatter-plot">scatter plot</a> with <code>date</code> on the x-axis and <code>score</code> on the y-axis, then a short paragraph on the pattern and its implications.</p>
 <h3 id="click-path">Click path</h3>
 <ol>
-<li>Pick <code>date</code> and <code>score</code> and select them with <code>date</code> on the left. (<code>score</code> is actually left of <code>date</code> in the starter — see below for the fix.)
+<li>Pick <code>date</code> and <code>score</code> and select them with <code>date</code> on the left. (<code>score</code> is actually left of <code>date</code> in the starter; see below for the fix.)
 <div class="reveal-block" style="margin-top: 10px;"><div class="reveal-question"><p><strong>But score is left of date in mine — what do I do?</strong></p></div><button class="reveal-btn" data-target="reveal-3" aria-expanded="false">Show the fix</button><div class="reveal-content" id="reveal-3" hidden><p>In the starter, <code>MATH</code> columns go <code>id</code>, <code>model</code>, <code>score</code>, <code>date</code>. That's backwards for a scatter, since Excel uses the leftmost selected column as the x-axis. Two fixes:</p>
 <ol style="list-style-type: lower-alpha;">
 <li><strong>Rearrange the table</strong> so <code>date</code> is left of <code>score</code>. Adam did this in the solutions workbook with a note: <em>"I modified the order of date and score in the table. There are most likely much better ways to do it."</em></li>
@@ -1224,25 +1254,25 @@ end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 </ol>
 <p>Either's fine.</p></div></div></li>
 <li>Insert tab → Scatter → first option (dots, no lines).</li>
-<li>The y-axis is a fraction from 0 to 1 — no log scale needed here, and in fact log scale would be actively wrong for a fraction. Leave the y-axis linear.</li>
+<li>The y-axis is a fraction from 0 to 1 — no log scale needed here, and log scale would actually be wrong for a fraction. Leave the y-axis linear.</li>
 <li>The x-axis should be a <a class="glossary-link" href="#glossary-date-axis" data-target="glossary-date-axis">date axis</a>, so Excel lays out points by true date position (not just categorically). Right-click the x-axis → Format Axis → Axis type → Date axis (this is usually selected automatically for scatter plots, but worth confirming).</li>
 <li>Title and label the axes — "MATH Level 5 score by release date", <code>Date</code>, <code>Score</code>.</li>
 </ol>
 <h3 id="what-you-should-see">What you should see</h3>
-<p>A roughly linear climb on the <em>linear</em> axis from mid-2023 (scores around 0.03 to 0.40 — <code>Llama-2-70B</code> and <code>Mistral 7B</code> near the floor, <code>GPT-4-0613</code> around 0.23, <code>gpt-4-1106-preview</code> reaching 0.40 by Q4) to early 2025 (top scores clustering 0.90 to 0.97 — <code>o3-mini-high</code> at 0.965, <code>DeepSeek-R1</code> at 0.931, <code>Claude 3.7 Sonnet 64K</code> at 0.912), with a lot of spread — different-size models have very different scores — but a clear upward trend. Towards the end, the top scores crowd against the ceiling at 1.0 because the benchmark has a maximum possible score.</p>
+<p>A roughly linear climb on the <em>linear</em> axis from mid-2023 (scores around 0.03 to 0.40 — <code>Llama-2-70B</code> and <code>Mistral 7B</code> near the floor, <code>GPT-4-0613</code> around 0.23, <code>gpt-4-1106-preview</code> reaching 0.40 by Q4) to early 2025 (top scores clustering 0.90 to 0.97 — <code>o3-mini-high</code> at 0.965, <code>DeepSeek-R1</code> at 0.931, <code>Claude 3.7 Sonnet 64K</code> at 0.912), with a lot of spread — different-size models have very different scores but a clear upward trend. Towards the end, the top scores crowd against the ceiling at 1.0 because the benchmark has a maximum possible score.</p>
 <h3 id="what-to-write">What to write</h3>
-<p>Four ideas to weave into the paragraph. The solution workbook has a model version you can paraphrase.</p>
+<p>Four points to mention in the paragraph. The solution workbook has a model version you can paraphrase.</p>
 <ol>
 <li><strong>The trend is roughly linear over two years on the score axis.</strong> Scores grow from near-zero to near-1 over about eighteen months, and the rate looks roughly constant on the linear axis.</li>
 <li><strong>Current top scores are essentially 1.0.</strong> Models like <code>o4-mini-2025-04-16_high</code> and <code>o3-2025-04-16_high</code> score around 0.978; <code>o3-mini-2025-01-31_high</code> scores 0.965, and <code>Gemini 2.5 Pro</code> reaches 0.959. The benchmark ceiling is being hit.</li>
-<li><strong>If the trend continued past 1, we'd expect future models to do well on harder math too</strong> — but since the benchmark caps at 1.0, we can't actually measure further progress with this benchmark.</li>
+<li><strong>If the trend continued past 1, we'd expect future models to do well on harder math too</strong> but since the benchmark caps at 1.0, we can't actually measure further progress with this benchmark.</li>
 <li><strong>This is benchmark saturation.</strong> When a test maxes out, a harder test is needed to differentiate the next generation of models. The MATH benchmark is already being replaced in industry by successors like Putnam-2024 and FrontierMath.</li>
 </ol>
 <p>The official wording from the solution: <em>"The scores have increased roughly linearly since the first model was released. Currently, the top score is approximately 1. This suggests that modern AI models are very strong at solving high school-level math problems. If the trend continues beyond a score of 1, we would expect future models to perform well on more advanced mathematics too. However, since this benchmark measures scores on a scale from 0 to 1, we cannot observe performance beyond that upper limit. This limitation is known as benchmark saturation."</em> Paraphrase rather than copy.</p>
-<p>The "which AI company is most focused on mathematical capabilities" question from 3a (asked alongside the <code>FINDBEST(2023)</code> output) — the expected answer is <strong>OpenAI</strong>, which dominates the quarterly best-in-quarter leaderboard with <code>GPT-4</code> (Q2 and Q4 2023), <code>o1-mini</code> (Q3 2024), <code>o1</code> (Q4 2024), <code>o3-mini</code> (Q1 2025), and <code>o4-mini</code> (Q2 2025) — six of the nine quarters in the dataset. Anthropic also tops three quarters (<code>Claude 2</code> in Q3 2023, <code>Claude 3 Opus</code> in Q1 2024, <code>Claude 3.5 Sonnet</code> in Q2 2024). Google and DeepSeek post strong individual scores (<code>Gemini 2.5 Pro</code> at 0.959, <code>DeepSeek-R1</code> at 0.931) but don't win any quarter.</p>
-<p>Common mistake: using a line chart instead of scatter. Line chart connects dots, which looks like you're claiming a continuous function of time — not what you want when models are discrete releases. Scatter is correct.</p>
+<p>The "which AI company is most focused on mathematical capabilities" question from 3a (asked alongside the <code>FINDBEST(2023)</code> output); the expected answer is <strong>OpenAI</strong>, which dominates the quarterly best-in-quarter leaderboard with <code>GPT-4</code> (Q2 and Q4 2023), <code>o1-mini</code> (Q3 2024), <code>o1</code> (Q4 2024), <code>o3-mini</code> (Q1 2025), and <code>o4-mini</code> (Q2 2025) — six of the nine quarters in the dataset. Anthropic also tops three quarters (<code>Claude 2</code> in Q3 2023, <code>Claude 3 Opus</code> in Q1 2024, <code>Claude 3.5 Sonnet</code> in Q2 2024). Google and DeepSeek post strong individual scores (<code>Gemini 2.5 Pro</code> at 0.959, <code>DeepSeek-R1</code> at 0.931) but don't win any quarter.</p>
+<p>Watch out: using a line chart instead of scatter. Line chart connects dots, which looks like you're claiming a continuous function of time — not what you want when models are discrete releases. Scatter is correct.</p>
 <p>Second common mistake: putting log scale on the score axis. Scores are fractions; <code>log(0.1)</code> is <code>-1</code>, <code>log(0.9)</code> is <code>-0.046</code>. A log axis squeezes high scores together and stretches low scores. On a linear axis 0 to 1 the visual spacing matches the quantities, which is what you want.</p>
-<p><strong>Lecture tie-in.</strong> Chart construction is in Part 2 of the course — the chart lecture <code>02Charts.pdf</code> and its companion workbook <code>02Charts.xlsx</code>. For scatter plots with date x-axes specifically, <code>02Charts.xlsx</code> sheet "2-AxesScales" has the worked examples; sheet "1-BadCharts" has the cautionary cases. The benchmark-saturation commentary isn't formally taught but it's the reason Jonas and Adam keep emphasising that the <em>choice</em> of benchmark matters — an observation worth making explicit in your write-up.</p>
+<p><strong>Where this came from.</strong> Chart construction is in Part 2 of the course; the chart lecture <code>02Charts.pdf</code> and its companion workbook <code>02Charts.xlsx</code>. For scatter plots with date x-axes specifically, <code>02Charts.xlsx</code> sheet "2-AxesScales" has the worked examples; sheet "1-BadCharts" has the cautionary cases. The benchmark-saturation commentary isn't formally taught but it's the reason Jonas and Adam keep emphasising that the <em>choice</em> of benchmark matters; an observation worth making explicit in your write-up.</p>
 <h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
 <p>If the <code>MAKEARRAY</code> construction is the block, stop working on <code>FINDBEST</code> and open <code>05lecturefilled.xlsx</code> sheet "BYROW, BYCOL, and MAKEARRAY". Work through each worked example in Excel Labs until you can predict what a 3x3 <code>MAKEARRAY(3, 3, LAMBDA(i, j, i * 10 + j))</code> call produces. Then come back to <code>FINDBEST</code>.</p>
 <p>If the helper function <code>FINDBEST_</code> errors on a particular quarter, test it in isolation: <code>=FINDBEST_(2023, 1)</code> should return <code>{2023, 1, "no data", "no data"}</code> (there's no 2023 Q1 data in <code>MATH</code>). <code>=FINDBEST_(2024, 3)</code> should give a real model and real score. Getting each quarter right in isolation is much easier than debugging it through the <code>MAKEARRAY</code> wrapper.</p>
@@ -1256,7 +1286,7 @@ end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 <dt id="glossary-date-axis"><strong>Date axis</strong></dt><dd><p>A chart axis type that lays out values by real date position, not by ordered position in the data. The right setting for scatter plots with date x-axes.</p></dd>
 <dt id="glossary-dynamic-array"><strong>Dynamic array</strong></dt><dd><p>A formula result that spills into a rectangular block of cells. <code>FINDBEST</code> returns a dynamic array; the top-left cell holds the formula, the rest of the block is filled in by Excel.</p></dd>
 <dt id="glossary-eomonthdate-months"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/eomonth-function" target="_blank" rel="noopener" title="View EOMONTH on ExcelJet">EOMONTH</a>(date, months)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns the last day of the month that is <code>months</code> months after <code>date</code>. <code>EOMONTH("2024-01-01", 2)</code> is <code>"2024-03-31"</code>. Used to compute the end-of-quarter date.</p></dd>
-<dt id="glossary-excel-labs"><strong>Excel Labs</strong></dt><dd><p>The Microsoft Research add-in that provides the Advanced Formula Environment — the pane where LAMBDAs are saved by name. Covered in Lecture 4.</p></dd>
+<dt id="glossary-excel-labs"><strong>Excel Labs</strong></dt><dd><p>The Microsoft Research add-in that provides the Advanced Formula Environment; the pane where LAMBDAs are saved by name. Covered in Lecture 4.</p></dd>
 <dt id="glossary-filterarray-keep-condition"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/filter-function" target="_blank" rel="noopener" title="View FILTER on ExcelJet">FILTER</a>(array, keep_condition)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Returns rows of <code>array</code> where <code>keep_condition</code> is <code>TRUE</code>. Used to restrict <code>MATH</code> to one quarter's rows.</p></dd>
 <dt id="glossary-hstacka-b"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/hstack-function" target="_blank" rel="noopener" title="View HSTACK on ExcelJet">HSTACK</a>(a, b, ...)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Stacks arrays horizontally. Used at the end of <code>FINDBEST_</code> to combine year, quarter, model, score into one row.</p></dd>
 <dt id="glossary-iferrorvalue-alt"><strong><code><a class="exceljet-link" href="https://exceljet.net/functions/iferror-function" target="_blank" rel="noopener" title="View IFERROR on ExcelJet">IFERROR</a>(value, alt)</code></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>If <code>value</code> is any error, return <code>alt</code> instead. Used to handle quarters with no matching data by substituting <code>NA()</code>.</p></dd>
@@ -1284,16 +1314,40 @@ end_,  IF(ISOMITTED(end_year),   MAX(years), end_year),
 (function () {
   const bar = document.querySelector('.progress-bar');
   const indicator = document.querySelector('.progress-indicator');
-  function onScroll() {
+  const topnav = document.querySelector('.topnav');
+  let lastScrollY = 0;
+  let ticking = false;
+  const HIDE_THRESHOLD = 80; /* px from top before we start hiding */
+  const SCROLL_TOLERANCE = 4; /* ignore tiny scroll jitter */
+  function applyScrollEffects() {
     const h = document.documentElement;
     const max = h.scrollHeight - h.clientHeight;
-    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    const y = h.scrollTop;
+    const p = max > 0 ? (y / max) * 100 : 0;
     if (bar) bar.style.width = p + '%';
     if (indicator) indicator.textContent = Math.round(p) + '%';
+    if (topnav) {
+      const delta = y - lastScrollY;
+      if (y < HIDE_THRESHOLD) {
+        topnav.classList.remove('topnav--hidden');
+      } else if (delta > SCROLL_TOLERANCE) {
+        topnav.classList.add('topnav--hidden');
+      } else if (delta < -SCROLL_TOLERANCE) {
+        topnav.classList.remove('topnav--hidden');
+      }
+    }
+    lastScrollY = y;
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(applyScrollEffects);
+      ticking = true;
+    }
   }
   document.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
-  onScroll();
+  applyScrollEffects();
 
   document.querySelectorAll('.reveal-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {

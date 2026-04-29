@@ -113,6 +113,15 @@ body {
   gap: 18px;
   box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
+  /* Hide-on-scroll-down behavior on narrow screens */
+  .topnav {
+    transition: transform 0.25s ease;
+    will-change: transform;
+  }
+  .topnav.topnav--hidden {
+    transform: translateY(-110%);
+  }
+
 
 .topnav-home {
   color: var(--cream);
@@ -126,6 +135,26 @@ body {
   border-left: 3px solid var(--seafoam);
   margin-right: 6px;
 }
+.topnav-index {
+  color: var(--cream);
+  text-decoration: none;
+  padding: 6px 12px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--header-font);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+.topnav-index:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 
 .topnav-home:hover { color: var(--seafoam); }
 
@@ -983,7 +1012,7 @@ body {
 <div class="progress-track" aria-hidden="true"><div class="progress-bar"></div></div>
 <div class="progress-indicator" aria-live="polite" aria-label="Reading progress">0%</div>
 <nav class="topnav" aria-label="Primary">
-  <a class="topnav-home" href="index.html" aria-label="BI Norwegian Business School — Home"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
+  <a class="topnav-home" href="https://www.bi.no/" target="_blank" rel="noopener noreferrer" aria-label="BI Norwegian Business School (opens in new tab)"><span class="topnav-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="135" height="48" viewBox="0 0 135 48" fill="none">
 <g clip-path="url(#clip0_9485_462)">
 <rect x="17.2181" width="26.7006" height="4" fill="url(#paint0_linear_9485_462)"/>
 <rect x="43.9187" width="3.99261" height="46" fill="url(#paint1_linear_9485_462)"/>
@@ -1037,6 +1066,7 @@ body {
 </clipPath>
 </defs>
 </svg></span></a>
+  <a class="topnav-index" href="index.html" aria-label="Back to overview">🏠 Home</a>
   <div class="topnav-groups">
     <div class="topnav-group topnav-p1"><span class="topnav-label">Part 1:</span>
       <a class="topnav-link" href="part1_exercise1.html">Ex1</a>
@@ -1068,9 +1098,9 @@ body {
     </li>
     <li class="toc-l2"><a href="#the-minimum-viable-click-through-version"><span class="toc-marker">03</span><span class="toc-text">The minimum-viable, click-through version</span></a>
     </li>
-    <li class="toc-l2"><a href="#pivot-table-path-the-walkthrough"><span class="toc-marker">04</span><span class="toc-text">Pivot-table path — the walkthrough</span></a>
+    <li class="toc-l2"><a href="#pivot-table-path-the-walkthrough"><span class="toc-marker">04</span><span class="toc-text">Pivot-table path; the walkthrough</span></a>
     </li>
-    <li class="toc-l2"><a href="#formula-path-the-lambda-story"><span class="toc-marker">05</span><span class="toc-text">Formula path — the LAMBDA story</span></a>
+    <li class="toc-l2"><a href="#formula-path-the-lambda-story"><span class="toc-marker">05</span><span class="toc-text">Formula path; the LAMBDA story</span></a>
     </li>
     <li class="toc-l2"><a href="#which-one-to-pick"><span class="toc-marker">06</span><span class="toc-text">Which one to pick</span></a>
     </li>
@@ -1084,7 +1114,7 @@ body {
 </aside>
   <main class="article-body">
     <h2 id="what-this-task-is-really-about">What this task is really about</h2>
-<p>You have a long daily table (the <code>BIKE</code> table, 730-odd rows, one row per day across 2011 and 2012) and you need a short monthly table (24 rows, one per month) with two columns of averages: average temperature for the month, and average number of users for the month. The user-type dropdown from Task 1 controls which underlying users column gets averaged, through the <code>Users</code> column you built in Task 1 — so Task 2 just has to believe that <code>[Users]</code> is already the right number.</p>
+<p>You have a long daily table (the <code>BIKE</code> table, 730-odd rows, one row per day across 2011 and 2012) and you need a short monthly table (24 rows, one per month) with two columns of averages: average temperature for the month, and average number of users for the month. The user-type dropdown from Task 1 controls which underlying users column gets averaged, through the <code>Users</code> column you built in Task 1, so Task 2 just has to believe that <code>[Users]</code> is already the right number.</p>
 <p>The exam explicitly says either a formula solution or a <a class="glossary-link" href="#glossary-pivot-table" data-target="glossary-pivot-table">pivot table</a> counts, and the official solution demonstrates both. This report does the same. The pivot is the shorter route and the one most students will pick; the formula version uses <a class="glossary-link" href="#glossary-lambda" data-target="glossary-lambda">LAMBDA</a> and is a real exercise in reasoning about arrays. Either one gets full marks for Task 2. If you pick the pivot you'll need it again for Task 3 anyway, and you'll want the formula version if your markers are nudging you towards the harder route.</p>
 <h2 id="how-to-read-the-exam-wording">How to read the exam wording</h2>
 <p>"Per month-year pair in the dataset" means you want one row per distinct combination of year and month — 2011-01, 2011-02, all the way through 2012-12. That's 24 rows. "The selected <code>userType</code>" is the dropdown; because the <code>Users</code> column on the <code>BIKE</code> table already reads the dropdown, all you need to do is average that column and the <code>temp</code> column grouped by <code>MonthYear</code>.</p>
@@ -1092,14 +1122,14 @@ body {
 <p>The note in the exam wording — "if you use a PivotTable you will have to refresh the PivotTable when you change the userType dropdown" — matters. Pivot tables cache their data; they don't recalculate automatically when a dependency changes. If the user picks a different dropdown value, the <code>Users</code> column on the <code>BIKE</code> table updates instantly, but the pivot keeps showing the old numbers until you refresh. The official script doesn't solve this — it would need a separate refresh script the user triggers. The formula version doesn't have this problem: Excel formulas are live.</p>
 <h2 id="the-minimum-viable-click-through-version">The minimum-viable, click-through version</h2>
 <p>Manual pivot: select any cell inside the <code>BIKE</code> table → Insert → PivotTable → place it on <code>Questions</code>. Drag <code>MonthYear</code> into Rows, <code>temp</code> and <code>Users</code> both into Values. Click the little arrow next to each value field and choose Summarize by → Average. Turn off column grand totals. Done. That took about forty seconds once you know where the buttons are.</p>
-<p>The script version reproduces those clicks in code. The formula version rebuilds the same output without a pivot at all. Both produce a 24-row table with three columns (date, average temp, average users).</p>
-<h2 id="pivot-table-path-the-walkthrough">Pivot-table path — the walkthrough</h2>
-<p>The official pivot code lives in <code>Q2pTable</code>. Four lines set up the pivot shape, one loop switches both value fields to averages, and one line hides the grand totals. All six lines are worth reading carefully — method signatures in the ExcelScript API are easy to mix up.</p>
+<p>The script version is just those clicks written out as code. The formula version skips the pivot entirely and gets the same numbers a different way. Either way you end up with a 24-row table: date, average temp, average users.</p>
+<h2 id="pivot-table-path-the-walkthrough">Pivot-table path; the walkthrough</h2>
+<p>The official pivot code lives in <code>Q2pTable</code>. Four lines set up the pivot shape, one loop switches both value fields to averages, and one line hides the grand totals. Read all six lines slowly. ExcelScript method signatures are easy to mix up.</p>
 <p>Start by placing the pivot:</p>
 <div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">let pTable = Qs.addPivotTable(&quot;Q2MonthlyAverages&quot;, bike, Qs.getCell(19, 1));
 </code></pre></div>
 <p><code>addPivotTable</code> takes three things: a name (<code>"Q2MonthlyAverages"</code> — visible later in the pivot-tables pane), the source (the <code>BIKE</code> table, referenced by the <code>bike</code> variable set up in <code>main</code>), and the destination cell (<code>getCell(19, 1)</code> = row 20, column B, written <code>B20</code> in Excel's 1-based address). After this line the workbook has an empty pivot sitting on <code>Questions</code> at <code>B20</code>. No rows, no values yet — you've only told Excel where it goes and what feeds it.</p>
-<p>(One thing worth knowing: the official script in <code>part2_solutions.txt</code> writes the pivot starting at <code>B20</code>, but the solutions workbook on file actually shows it at <code>B23</code> — the workbook was adjusted after the script was last run. If your output lands at <code>B20</code> you've followed the code correctly; do not try to "fix" the discrepancy.)</p>
+<p>(One thing worth knowing: the official script in <code>part2_solutions.txt</code> writes the pivot starting at <code>B20</code>, but the solutions workbook on file actually shows it at <code>B23</code>; the workbook was adjusted after the script was last run. If your output lands at <code>B20</code> you've followed the code correctly; do not try to "fix" the discrepancy.)</p>
 <p>Next, pin the row field and the two data fields:</p>
 <div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">pTable.addRowHierarchy(pTable.getHierarchy(&quot;MonthYear&quot;));
 let temp = pTable.addDataHierarchy(pTable.getHierarchy(&quot;temp&quot;));
@@ -1124,10 +1154,10 @@ return pTable;
 02/01/2011           11.584             1722.0
 ...
 </code></pre></div>
-<p><em>Methods used: <code>addPivotTable</code>, <code>getHierarchy</code>, <code>addRowHierarchy</code>, <code>addDataHierarchy</code>, <code>setSummarizeBy</code>, <code>getLayout</code>, <code>setShowColumnGrandTotals</code> — see pivottable.pdf and workbook_worksheet.pdf.</em></p>
+<p><em>Methods used: <code>addPivotTable</code>, <code>getHierarchy</code>, <code>addRowHierarchy</code>, <code>addDataHierarchy</code>, <code>setSummarizeBy</code>, <code>getLayout</code>, <code>setShowColumnGrandTotals</code>; see pivottable.pdf and workbook_worksheet.pdf.</em></p>
 <p>The thing that will go wrong: if the dropdown on <code>B12</code> changes, the <code>Users</code> column on the <code>BIKE</code> table recomputes immediately, but the pivot cache still holds the old numbers. The pivot will visually not update. Marker-friendly solution: add a button or a separate script that calls <code>pTable.refresh()</code> after the dropdown change. The official script doesn't include this because it's an architectural decision, not a correctness one.</p>
-<h2 id="formula-path-the-lambda-story">Formula path — the LAMBDA story</h2>
-<p>The formula solution builds a single dynamic-<a class="glossary-link" href="#glossary-array-formula" data-target="glossary-array-formula">array formula</a> that produces the same 24-row, 3-column output without a pivot. It's packaged as a <a class="glossary-link" href="#glossary-named-lambda" data-target="glossary-named-lambda">named LAMBDA</a> called <code>getQ2Averages</code>, and a single cell calls it with <code>=getQ2Averages(BIKE)</code>. When that formula runs it <em>spills</em> a block of values across F23:H47 — a whole region filled from one formula.</p>
+<h2 id="formula-path-the-lambda-story">Formula path; the LAMBDA story</h2>
+<p>The formula solution builds a single dynamic-<a class="glossary-link" href="#glossary-array-formula" data-target="glossary-array-formula">array formula</a> that produces the same 24-row, 3-column output without a pivot. It's packaged as a <a class="glossary-link" href="#glossary-named-lambda" data-target="glossary-named-lambda">named LAMBDA</a> called <code>getQ2Averages</code>, and a single cell calls it with <code>=getQ2Averages(BIKE)</code>. When that formula runs it <em>spills</em> a block of values across F23:H47; a whole region filled from one formula.</p>
 <p>A <em><a class="glossary-link" href="#glossary-dynamic-array" data-target="glossary-dynamic-array">dynamic array</a></em> is a formula that returns more than one value and fills a rectangle of cells starting from the cell it's written in. A <em>spill range</em> is that rectangle. If any of the target cells already contain data, the formula errors with <code>#SPILL!</code>. You can see if a cell is the origin of a spill because it shows the whole block highlighted with a blue outline when selected.</p>
 <p>Before diving into the official formula, a pause for the underlying idea.</p>
 <div class="reveal-block"><div class="reveal-question"><p><strong>Pause.</strong>You have 24 months of data and the <code>BIKE[MonthYear]</code> column repeats each month-value about 30 times. How would you take the list of 24 unique months and, for each one, average the <code>temp</code> values that match it? Sketch it in words.</p></div><button class="reveal-btn" data-target="reveal-1" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-1" hidden><p>The plan is: get the 24 unique months; then for each month, <a class="glossary-link" href="#glossary-filter" data-target="glossary-filter">filter</a> the temp column down to just the days in that month and take the average; do the same for users; stack the three columns side-by-side; add a header row on top.</p>
@@ -1156,32 +1186,32 @@ return pTable;
 <p><strong><code>temp</code></strong> is where it gets dense. <code>BYROW(dates, LAMBDA(row, ...))</code> runs the lambda once per entry in <code>dates</code>. For the first entry (<code>01/01/2011</code>), <code>row</code> equals <code>01/01/2011</code>, so <code>FILTER(BIKE[temp], BIKE[MonthYear] = row)</code> returns only the temperature values where MonthYear equals January 2011 — all 31 of them. <code>AVERAGE(...)</code> collapses those 31 values to one. BYROW then does the same for February, and so on. <code>temp</code> ends up as a 24-row, 1-column array of per-month average temperatures.</p>
 <p><strong><code>user</code></strong> is structurally identical, just swapped for the <code>Users</code> column. 24 rows, 1 column, one average per month.</p>
 <p><strong><code>headers</code></strong> is <code>{"Date", "Temperature", "Users"}</code>. Curly-brace syntax with commas makes a horizontal 1×3 literal array. Semicolons would make it vertical. This is the header row the final output wants.</p>
-<p><strong><code>body</code></strong> is <code>HSTACK(dates, temp, user)</code>. Three 24-row, 1-column arrays stacked side by side produce a single 24-row, 3-column array — the data body, without headers.</p>
-<p>The final return is <code>VSTACK(headers, body)</code> — a 1×3 array stacked on top of a 24×3 array gives a 25×3 result. That's what spills into F23:H47 when the cell formula <code>=getQ2Averages(BIKE)</code> is run.</p>
-<p><em>Methods used: <code>addNamedItem</code> (worksheet-scoped, because <code>Qs.addNamedItem</code> rather than <code>workbook.addNamedItem</code>), <code>setFormula</code>, <code>getAbsoluteResizedRange</code>, <code>getSurroundingRegion</code>, <code>getRowCount</code>, <code>setNumberFormat</code> — see workbook_worksheet.pdf and range.pdf.</em></p>
+<p><strong><code>body</code></strong> is <code>HSTACK(dates, temp, user)</code>. Three 24-row, 1-column arrays stacked side by side produce a single 24-row, 3-column array; the data body, without headers.</p>
+<p>The final return is <code>VSTACK(headers, body)</code>; a 1×3 array stacked on top of a 24×3 array gives a 25×3 result. That's what spills into F23:H47 when the cell formula <code>=getQ2Averages(BIKE)</code> is run.</p>
+<p><em>Methods used: <code>addNamedItem</code> (worksheet-scoped, because <code>Qs.addNamedItem</code> rather than <code>workbook.addNamedItem</code>), <code>setFormula</code>, <code>getAbsoluteResizedRange</code>, <code>getSurroundingRegion</code>, <code>getRowCount</code>, <code>setNumberFormat</code>; see workbook_worksheet.pdf and range.pdf.</em></p>
 <p>The script wraps the formula in a named item first, then writes the call into a single cell, then reformats the date column:</p>
 <div class="code-block" data-lang="ts"><span class="code-lang">TypeScript</span><button class="copy-btn" type="button">Copy</button><pre><code class="language-ts">Qs.getCell(19, 5).setFormula(&quot;=getQ2Averages(BIKE)&quot;);
 let cell = Qs.getCell(20, 5);
 cell.getAbsoluteResizedRange(cell.getSurroundingRegion().getRowCount() - 1, 1)
     .setNumberFormat(&quot;mm/yyyy&quot;);
 </code></pre></div>
-<p><code>getCell(19, 5)</code> is <code>F20</code> — where the script writes the formula. <code>getCell(20, 5)</code> is <code>F21</code>, the first data cell under the header. (Same script-vs-workbook caveat as the pivot version: the script places the formula at <code>F20</code>, but the solutions workbook on file actually shows the spill starting at <code>F23</code> — the workbook was adjusted after the script was last run. If your output lands at <code>F20:H44</code> you've followed the code correctly.) <code>getSurroundingRegion()</code> returns the whole contiguous block that includes that cell (so, the entire spill). <code>getRowCount() - 1</code> subtracts the header row. <code>getAbsoluteResizedRange(rows, 1)</code> then reshapes the single cell back into a 1-column range of the right height (covering only the date cells under the header). <code>setNumberFormat("mm/yyyy")</code> gives them the same display format as the <code>MonthYear</code> column on the <code>BIKE</code> table.</p>
+<p><code>getCell(19, 5)</code> is <code>F20</code> — where the script writes the formula. <code>getCell(20, 5)</code> is <code>F21</code>, the first data cell under the header. (Same script-vs-workbook caveat as the pivot version: the script places the formula at <code>F20</code>, but the solutions workbook on file actually shows the spill starting at <code>F23</code>; the workbook was adjusted after the script was last run. If your output lands at <code>F20:H44</code> you've followed the code correctly.) <code>getSurroundingRegion()</code> returns the whole contiguous block that includes that cell (so, the entire spill). <code>getRowCount() - 1</code> subtracts the header row. <code>getAbsoluteResizedRange(rows, 1)</code> then reshapes the single cell back into a 1-column range of the right height (covering only the date cells under the header). <code>setNumberFormat("mm/yyyy")</code> gives them the same display format as the <code>MonthYear</code> column on the <code>BIKE</code> table.</p>
 <p>The thing that goes wrong: if any cell in the spill destination isn't empty, the formula fails with <code>#SPILL!</code>. If you're following the script exactly, clear <code>F20:H44</code> before running it. If you're matching the adjusted solution workbook layout, clear <code>F23:H47</code>. This includes any whitespace or leftover content you can't easily see.</p>
 <h2 id="which-one-to-pick">Which one to pick</h2>
 <p>If you want the shortest correct answer, the pivot is six lines, uses concepts the lectures covered, and is hard to get wrong. Its one weakness — needing to be refreshed when the dropdown changes — is a known trade-off and easy to patch with a refresh button if you want to be thorough.</p>
 <p>If you want the more instructive answer, the LAMBDA version teaches you something about array formulas that will show up again if you ever do real data work in Excel. It's also self-refreshing — change the dropdown and the averages update immediately, because the formula reads <code>BIKE[Users]</code> which is itself a formula.</p>
-<p>Practically, a student with limited time should pick the pivot. A student with the LAMBDA version working can submit both, exactly as the official solution does — the top text on the <code>Questions</code> sheet in the solutions workbook reads "ONLY ONE APPROACH IS REQUIRED — HERE I DEMONSTRATE BOTH A FORMULA SOLUTION AND A PIVOTTABLE SOLUTION", and neither is penalised.</p>
+<p>Practically, a student with limited time should pick the pivot. A student with the LAMBDA version working can submit both, exactly as the official solution does; the top text on the <code>Questions</code> sheet in the solutions workbook reads "ONLY ONE APPROACH IS REQUIRED — HERE I DEMONSTRATE BOTH A FORMULA SOLUTION AND A PIVOTTABLE SOLUTION", and neither is penalised.</p>
 <div class="reveal-block"><div class="reveal-question"><p><strong>Try it first.</strong>Build the pivot via the GUI before you script it. Then read the six script lines one by one and match each to a thing you clicked. The script suddenly feels less magical.</p></div><button class="reveal-btn" data-target="reveal-2" aria-expanded="false">Show the walkthrough</button><div class="reveal-content" id="reveal-2" hidden><p>The GUI-to-script map is direct: <code>addPivotTable</code> is Insert PivotTable, <code>addRowHierarchy(MonthYear)</code> is dragging <code>MonthYear</code> to Rows, the two <code>addDataHierarchy</code> calls are dragging <code>temp</code> and <code>Users</code> to Values, <code>setSummarizeBy(...average)</code> is changing both value fields from Sum to Average, and <code>setShowColumnGrandTotals(false)</code> is turning off the grand-total row.</p></div></div><h2 id="an-alternative-worth-mentioning">An alternative worth mentioning</h2>
 <p>A third path, not taken by the official solution, is a helper-column approach: on the <code>BIKE</code> table, add columns for per-row month averages using <code>AVERAGEIFS</code>, then take <code>UNIQUE(MonthYear)</code> in the destination and look up the values. It works but it bloats the <code>BIKE</code> table with two calculation columns and re-does the same average for every one of the 731 rows. The LAMBDA approach is tidier — it keeps the calculation in one place and only computes each monthly average once.</p>
 <h2 id="if-this-still-feels-shaky">If this still feels shaky</h2>
-<p>01PivotTables.pdf walks through the UI side of pivot tables — the drag-and-drop version of what <code>addRowHierarchy</code> and <code>addDataHierarchy</code> are scripting. pivottable.pdf is the method cheatsheet. For the LAMBDA side, the Part 1 lectures cover every building block: <code>04lecturefilled.xlsx</code> for LAMBDA, <code>06lecturefilled.xlsx</code> for LET, <code>03lecturefilled.xlsx</code> for UNIQUE/FILTER, and <code>05lecturefilled.xlsx</code> for BYROW and HSTACK/VSTACK. range.pdf explains <code>getSurroundingRegion</code> and <code>getAbsoluteResizedRange</code>, which are the two methods in the formula version that most students skim past without noticing.</p>
+<p>01PivotTables.pdf walks through the UI side of pivot tables; the drag-and-drop version of what <code>addRowHierarchy</code> and <code>addDataHierarchy</code> are scripting. pivottable.pdf is the method cheatsheet. For the LAMBDA side, the Part 1 lectures cover every building block: <code>04lecturefilled.xlsx</code> for LAMBDA, <code>06lecturefilled.xlsx</code> for LET, <code>03lecturefilled.xlsx</code> for UNIQUE/FILTER, and <code>05lecturefilled.xlsx</code> for BYROW and HSTACK/VSTACK. range.pdf explains <code>getSurroundingRegion</code> and <code>getAbsoluteResizedRange</code>, which are the two methods in the formula version that most students skim past without noticing.</p>
     <section class="glossary-section" id="glossary">
 <h2 id="glossary-heading">Glossary</h2>
 <dl class="glossary-list">
 <dt id="glossary-aggregation"><strong>Aggregation</strong></dt><dd><p>a function that reduces many numbers to one: SUM, AVERAGE, COUNT, MIN, MAX. <code>setSummarizeBy(ExcelScript.AggregationFunction.average)</code> sets which aggregation a pivot's data field uses.</p></dd>
 <dt id="glossary-argument"><strong>Argument</strong></dt><dd><p>a value passed to a function when you call it. In <code>AVERAGE(BIKE[temp])</code>, <code>BIKE[temp]</code> is the argument.</p></dd>
 <dt id="glossary-array-formula"><strong>Array formula</strong></dt><dd><p>a formula that works on (or returns) a whole block of values rather than a single number. Modern Excel handles these through dynamic arrays.</p></dd>
-<dt id="glossary-arrow-function"><strong>Arrow function</strong></dt><dd><p>(not used in the official code, but likely seen elsewhere) — a compact way to write a function in TypeScript, like <code>(x) =&gt; x * 2</code>.</p></dd>
+<dt id="glossary-arrow-function"><strong>Arrow function</strong></dt><dd><p>(not used in the official code, but likely seen elsewhere); a compact way to write a function in TypeScript, like <code>(x) =&gt; x * 2</code>.</p></dd>
 <dt id="glossary-byrow"><strong><a class="exceljet-link" href="https://exceljet.net/functions/byrow-function" target="_blank" rel="noopener" title="View BYROW on ExcelJet">BYROW</a></strong> <span class="exceljet-icon" aria-hidden="true">↗</span></dt><dd><p>Excel function that applies a lambda to each row of an array, returning one value per row.</p></dd>
 <dt id="glossary-column-field"><strong>Column field</strong></dt><dd><p>a pivot field dropped into the Columns area. Not used in this exam; the pivot here has a row field but no column field.</p></dd>
 <dt id="glossary-data-field-value-field"><strong>Data field / value field</strong></dt><dd><p>a pivot field dropped into the Values area; its values get aggregated.</p></dd>
@@ -1208,16 +1238,40 @@ cell.getAbsoluteResizedRange(cell.getSurroundingRegion().getRowCount() - 1, 1)
 (function () {
   const bar = document.querySelector('.progress-bar');
   const indicator = document.querySelector('.progress-indicator');
-  function onScroll() {
+  const topnav = document.querySelector('.topnav');
+  let lastScrollY = 0;
+  let ticking = false;
+  const HIDE_THRESHOLD = 80; /* px from top before we start hiding */
+  const SCROLL_TOLERANCE = 4; /* ignore tiny scroll jitter */
+  function applyScrollEffects() {
     const h = document.documentElement;
     const max = h.scrollHeight - h.clientHeight;
-    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    const y = h.scrollTop;
+    const p = max > 0 ? (y / max) * 100 : 0;
     if (bar) bar.style.width = p + '%';
     if (indicator) indicator.textContent = Math.round(p) + '%';
+    if (topnav) {
+      const delta = y - lastScrollY;
+      if (y < HIDE_THRESHOLD) {
+        topnav.classList.remove('topnav--hidden');
+      } else if (delta > SCROLL_TOLERANCE) {
+        topnav.classList.add('topnav--hidden');
+      } else if (delta < -SCROLL_TOLERANCE) {
+        topnav.classList.remove('topnav--hidden');
+      }
+    }
+    lastScrollY = y;
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(applyScrollEffects);
+      ticking = true;
+    }
   }
   document.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
-  onScroll();
+  applyScrollEffects();
 
   document.querySelectorAll('.reveal-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
