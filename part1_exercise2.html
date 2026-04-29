@@ -932,6 +932,36 @@ body {
   .page-shell { display: block; }
 }
 
+
+/* ---------- Mobile (≤480px): shrink base sizing ---------- */
+@media (max-width: 480px) {
+  body {
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .topnav {
+    padding: 7px 12px 7px 12px;
+    gap: 10px;
+  }
+  .topnav-home {
+    padding: 2px 8px 2px 4px;
+    font-size: 0.95rem;
+  }
+  h1 { font-size: 1.7rem; }
+  h2 { 
+    font-size: 1.35rem;
+    margin-top: 2.2rem;
+    padding-top: 1.4rem;
+  }
+  h3 { font-size: 1.1rem; }
+  pre {
+    font-size: 0.85rem;
+    padding: 4px 12px 12px;
+  }
+  .code-block {
+    margin: 1rem 0 1.1rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -1069,7 +1099,7 @@ body {
 </ol>
 <p>That's it for the load-bearing work. Cosmetic polish — colours, marker size, gridlines, removing the empty <a class="glossary-link" href="#glossary-legend" data-target="glossary-legend">legend</a> — is nice but doesn't earn marks. The load-bearing bits are the chart type (scatter, not line), the <a class="glossary-link" href="#glossary-axis-type" data-target="glossary-axis-type">axis type</a> (log, base 10, on FLOP), and which column is which.</p>
 <h3 id="what-you-should-see">What you should see</h3>
-<p>Dots scatter in a roughly diagonal band from bottom-left (2022 models, <code>1E+23</code> to a few times <code>1E+24</code>) to top-right (2025 models, <code>1E+25</code> to about <code>5E+26</code> for the Grok-3 outlier). On the log axis the band looks roughly linear — a straight-line shape on a log axis means exponential growth in the underlying numbers.</p>
+<p>Dots scatter in a wide vertical band each year, with the band's upper edge climbing year-over-year — from <code>1E+23</code> to a few times <code>1E+24</code> in 2022, all the way up to <code>4.6E+26</code> for the Grok-3 outlier in 2025. The lower edge stays near <code>1E+23</code> throughout: even in 2025, smaller models like Evo 2 and Qwen3-0.6B sit at the floor. On the log axis the upper edge looks roughly linear — a straight-line shape on a log axis means exponential growth in the underlying numbers.</p>
 <h3 id="what-to-write-two-or-three-sentences-is-enough">What to write (two or three sentences is enough)</h3>
 <p>The solution workbook's observation is a good model to paraphrase: <em>"The maximal FLOP increases linearly on the log-axis. This means there is an exponential trend in the maximal FLOPS used. Moreover, all FLOPs are at least roughly <code>1E+23</code>, and there are plenty of models with such small FLOPS each year. The data set evidently contains both very large models such as Grok-3 but also smaller models with fewer FLOPS used during training."</em> The points to make, in your own words: the trend is exponential (straight-line-ish on log), there's a floor somewhere around <code>1E+23</code>, and each year contains a wide spread of models — not just frontier ones.</p>
 <p>Common mistake: confusing a scatter plot with a line chart. Line charts assume the x-axis is a categorical sequence (1, 2, 3, ...) — if you hand one a date column, it will compress or reorder weirdly. Scatter treats dates as real numeric positions on the axis.</p>

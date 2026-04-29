@@ -932,6 +932,36 @@ body {
   .page-shell { display: block; }
 }
 
+
+/* ---------- Mobile (≤480px): shrink base sizing ---------- */
+@media (max-width: 480px) {
+  body {
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .topnav {
+    padding: 7px 12px 7px 12px;
+    gap: 10px;
+  }
+  .topnav-home {
+    padding: 2px 8px 2px 4px;
+    font-size: 0.95rem;
+  }
+  h1 { font-size: 1.7rem; }
+  h2 { 
+    font-size: 1.35rem;
+    margin-top: 2.2rem;
+    padding-top: 1.4rem;
+  }
+  h3 { font-size: 1.1rem; }
+  pre {
+    font-size: 0.85rem;
+    padding: 4px 12px 12px;
+  }
+  .code-block {
+    margin: 1rem 0 1.1rem;
+  }
+}
 </style>
 </head>
 <body>
