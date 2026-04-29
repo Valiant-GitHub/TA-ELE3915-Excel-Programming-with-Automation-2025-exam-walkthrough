@@ -1,12 +1,6 @@
 # ELE3915 — 2025 Take-Home Exam Walkthroughs
 
-Interactive companion reports for the ELE3915 (Excel Programming & Automation, BI Norwegian Business School) 2025 take-home exam. Self-contained HTML — open any file in a browser, no install, no network, everything can render offline. However, I also deployed it with https://wasmer.io/ for free at https://bi-ta-ele3915-2025-exam-walkthrough.wasmer.app/ making it accessible on any browser and most devices.
-
-WEBSITE STATUS: UP 🟢
-
-## What this is
-
-This is a set of walkthroughs I put together while TA-ing ELE3915 — basically the explanations I'd give in office hours, written down so anyone can follow them on their own. Each report takes one exam question, breaks down what's actually being asked, and walks the official solution one piece at a time. I've flagged the partial-credit shortcuts where they exist (a one-line `XLOOKUP` instead of a `FILTER`-returns-a-row, a manual list instead of a dynamic array — that kind of thing) and pointed back to the exact lecture sheet or worked exercise where each pattern was first taught, so you can go reread the source if something doesn't click. If you've been stuck on one of these problems for half an hour, this is what I'd say to you sitting next to your laptop.
+Interactive companion reports for the ELE3915 (Excel Programming & Automation, BI Norwegian Business School) 2025 take-home exam. Self-contained HTML — open any file in a browser, no install, no network, everything renders offline.
 
 ## Contents
 
@@ -47,17 +41,18 @@ Every feature works offline. No tracking, no analytics, no remote fonts.
 
 ## Design system
 
-Base theme is **Ocean Depths** — maritime blue on warm paper. Accents shift per part so you can tell at a glance which half of the exam you're reading:
+Colour identity uses BI Norwegian Business School's brand blues — Strong Blue (`#002341`), Default Blue (`#093F82`), and Accent Blue (`#0A64FF`) from the [official BI brand book](https://design.bi.no/colour-2). The landing-page title flows in a horizontal gradient from Default Blue to Accent Blue. The persistent top navigation bar uses a horizontal gradient from Strong Blue to Default Blue; the table-of-contents sidebar uses the same colours running vertically.
+
+Per-part accent colours signal which half of the exam you're reading:
 
 | Context | Accent | Where it shows |
 | --- | --- | --- |
-| Landing page | `#2d8b8b` (base teal) | neutral centre point |
 | Part 1 reports | `#43c2c2` (brighter teal) | progress bar, TOC active state, section numbers, code-panel left edge, reveal glyph, glossary flash |
 | Part 2 reports | `#5fcc8f` (light green) | same surfaces as Part 1, rendered in the Part 2 hue |
 
-The accent colour is the only thing that changes per part. Typography, layout, the navy navigation bar, the dark code-panel surface, and body prose stay identical across all seven pages so the palette still feels coherent.
+Each report's H1 title and page-subtitle render as a horizontal gradient from Default Blue to that part's accent colour, so the colour flow you see on the landing-page card carries straight over to the report you click into. The same gradient lands on the landing-page card titles themselves, providing visual continuity between hub and reports.
 
-Fonts are DejaVu Sans for body and headers with DejaVu Sans Mono for code and numeric markers. The design intentionally avoids Inter/Poppins, gradient backgrounds, and uniform rounded corners.
+Fonts are DejaVu Sans for body and headers with DejaVu Sans Mono for code and numeric markers.
 
 ## For students
 
@@ -65,4 +60,4 @@ Each report is written for a bachelor student working through the exam on their 
 
 ## Credits
 
-Made by Vilijam Cekov (Teaching Assistant) for the course ELE3915 — Excel Programming & Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Ocean Depths theme from the `theme-factory` palette collection. Excel function references link to the excellent [ExcelJet](https://exceljet.net/) reference library.
+Made by Vilijam Cekov (Teaching Assistant) for the course ELE3915 — Excel Programming & Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Excel function references link to the excellent [ExcelJet](https://exceljet.net/) reference library.
