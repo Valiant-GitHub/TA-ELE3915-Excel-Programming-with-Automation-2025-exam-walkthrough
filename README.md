@@ -65,4 +65,4 @@ Each report is written for a bachelor student working through the exam on their 
 
 ## Credits
 
-Made by Vilijam Cekov (Teaching Assistant) for the course ELE 3915 Excel Programming with Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Ocean Depths theme from the `theme-factory` palette collection. Excel function references link to the excellent [ExcelJet](https://exceljet.net/) reference library.
+Made by Vilijam Cekov (Teaching Assistant) for the course ELE3915 — Excel Programming & Automation for the students of Jonas Moss (Part I) and Adam Lee (Part II) at BI Norwegian Business School. Ocean Depths theme from the `theme-factory` palette collection. Excel function references link to the excellent [ExcelJet](https://exceljet.net/) reference library.
